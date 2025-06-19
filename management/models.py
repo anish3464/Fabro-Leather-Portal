@@ -2,7 +2,6 @@ from django.db import models
 import os
 import random
 import string
-from simple_history.models import HistoricalRecords
 class Brand(models.Model):
     name = models.CharField(max_length=100, unique=True)
 
@@ -45,7 +44,7 @@ class YearRange(models.Model):
     
 class SKU(models.Model):
     code = models.CharField(max_length=100, unique=True)
-    description = models.TextField()
+    description = models.CharField(max_length=255, blank=True, null=True)
 
     def __str__(self):
         return self.code
