@@ -110,7 +110,27 @@ def add_car_details(request):
     })
 
 
-
+@login_required
+def car_details(request):
+    car_data = []
+    for brand in Brand.objects.prefetch_related('models__submodels__year_ranges').all():
+        for model in brand.models.all():
+            for sub_model in model.submodels.all():
+                for year_range in sub_model.year_ranges.all():
+                    car_data.append({
+                        "layout_code": year_range.layout_code,
+                        "id": year_range.id,
+                        "brand": brand.name,
+                        "model": model.name,
+                        "sub_model": sub_model.name,
+                        "year_start": year_range.year_start,
+                        "year_end": year_range.year_end,
+                        "seats": year_range.number_of_seats,
+                        "doors": year_range.number_of_doors
+                    })
+    return render(request, 'management/car_details.html', {
+    'car_data': car_data
+    })
 
 
 @login_required

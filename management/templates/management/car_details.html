@@ -8,69 +8,45 @@
 </head>
 {% include 'management/base.html' %}
 <body>
-    <h2>Add Car Details</h2>
-    
-    
-
-    <form method="POST">
-    {% csrf_token %}
-    {% if form.errors %}
-        <div class="error">
-            <p>Please correct the errors below:</p>
-            <ul>
-                {% for field in form %}
-                    {% for error in field.errors %}
-                        <li>{{ error }}</li>
-                    {% endfor %}
-                {% endfor %}
-                {% for error in form.non_field_errors %}
-                    <li>{{ error }}</li>
-                {% endfor %}
-            </ul>
-        </div>
-    {% endif %}
-    {{ form.as_p }}
-
-    <button type="submit">Add Car Details</button>
-    <button  onclick="window.location.href='{% url 'upload_car_csv' %}'">Upload Car CSV</button>
-</form>
-{% if show_duplicate_modal %}
-<div id="duplicateModal" class="modal-overlay" style="display:block;">
-  <div class="modal-box">
-    <div class="modal-header">
-            <h2>Duplicate Car Entry</h2>
-            <span class="close" onclick="this.parentElement.parentElement.style.display='none';">&times;</span>
-    </div>
-    <div class="modal-body">
-    <p>This car overlaps with an existing entry:</p>
-    <p><strong>Brand:</strong> {{ conflicting_car.brand }}</p>
-    <p><strong>Model:</strong> {{ conflicting_car.model }}</p>
-    <p><strong>Sub-Model:</strong> {{ conflicting_car.sub_model }}</p>
-    <p><strong>Year Range:</strong> {{ conflicting_car.year_start }} - {{ conflicting_car.year_end }}</p>
-    </div>
-    <div class="modal-footer">
-        <button onclick="closeDuplicateModal()">OK</button>
-    </div>
-  </div>
-</div>
-{% endif %}
-<!-- Layout Code Duplicate Error Modal -->
- {% if show_layout_code_error_modal %}
-<div id="layoutCodeErrorModal" class="modal-overlay" style="display:block;">
-  <div class="modal-box">
-    <div class="modal-header">
-            <h2>Duplicate Layout Code</h2>
-            <span class="close" onclick="document.getElementById('layoutCodeErrorModal').style.display='none'">&times;</span>
-    </div>
-    <div class="modal-body">
-    <p>The layout code you entered already exists. Please use a unique layout code.</p>
-    </div>
-  </div>
-</div>
-{% endif %}
-
-
-
+    <h3>Existing Car Details</h3>
+    <input type="text" id="brandSearchInput" placeholder="Search by Layout-Code..." class="search-input">
+    <input type="text" id="modelSearchInput" placeholder="Search by Brand..." class="search-input">
+    <input type="text" id="subModelSearchInput" placeholder="Search by Model..." class="search-input">  
+<table class="car-table">
+    <thead>
+        <tr>
+            <th>Sl. No.</th>
+            <th>Layout Code</th>
+            <th>Brand</th>
+            <th>Model</th>
+            <th>Sub-Model</th>
+            <th>Year Range</th>
+            <th>Seats</th>
+            <th>Doors</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for car in car_data %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ car.layout_code}}</td>
+                <td>{{ car.brand }}</td>
+                <td>{{ car.model }}</td>
+                <td>{{ car.sub_model }}</td>
+                <td>{{ car.year_start }} - {{ car.year_end }}</td>
+                <td>{{ car.seats }}</td>
+                <td>{{ car.doors }}</td>
+                <td><a href="{% url 'edit_car_detail' car.id %}" class="delete-button">Edit</a>
+                <a href="{% url 'delete_car_detail' car.id %}" class="delete-button">🗑️</a></td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="5">No car details added yet.</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
 <style>
 /* Dark Background and Base Styles */
 body {
@@ -87,8 +63,8 @@ h1 {
 }
 
 .form-container {
-    width: 70%;
-    max-width: 500px;
+    width: 80%;
+    max-width: 700px;
     margin: 5% auto;
     padding: 20px;
     background-color: #1f1f1f;
@@ -169,7 +145,7 @@ form input[type="text"], form input[type="number"] {
     border: 1px solid #444466;
     padding: 10px;
     border-radius: 5px;
-    width: 95%;
+    width: 100%;
     margin-bottom: 15px;
 }
 
@@ -643,18 +619,7 @@ function closeDuplicateModal() {
 }
 </script>
 
-{% if show_duplicate_modal %}
-<script>
-    window.onload = function() {
-        document.getElementById("duplicateModal").style.display = "flex";
-    }
-</script>
-{% endif %}
-
-
-    
-
-    
+ 
 </body>
 
 </html>

@@ -13,6 +13,7 @@ urlpatterns = [
     path('complaints/', views.complaint_list, name='complaint_list'),
     path('', views.index, name='index'),
     path('add-car-details/', views.add_car_details, name='add_car_details'),
+    path('car-details/', views.car_details, name='car_details'),
     path('delete-car-detail/<int:year_range_id>/', views.delete_car_detail, name='delete_car_detail'),
     path('edit-car/<int:car_id>/', views.edit_car_detail, name='edit_car_detail'),
     path('master-settings/', views.master_settings, name='master_settings'),

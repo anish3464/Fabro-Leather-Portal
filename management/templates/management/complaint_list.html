@@ -420,12 +420,12 @@ body.light-mode .action-buttons a {
     <table>
         <thead>
             <tr>
-            <th>Sl. No.</th>    
+            <th>#</th>    
             <th>Date</th>
             <th>Channel</th>
             <th>Country</th>
-            <th>Case Category</th>
-            <th>Case Sub-Category</th>
+            <th>Category</th>
+            <th>Type</th>
             <th>Person</th>
             <th>Brand</th>
             <th>Model</th>
@@ -436,8 +436,8 @@ body.light-mode .action-buttons a {
             <th>Complaint</th>
             <th>Batch/Order</th>
             <th>SKU</th>
-            <th>Justification</th>
-            <th>Action</th>
+            <th>Reason</th>
+            <th>Resolution</th>
             <th>Status</th>
             <th>Media Files</th>
             <th>Actions</th>
@@ -478,10 +478,9 @@ body.light-mode .action-buttons a {
                 <span class="close" onclick="closeModal('{{ complaint.complaint_id }}')">&times;</span>
                 <h2>Complaint {{ forloop.counter }}</h2>
                 <p><strong>Date:</strong> {{ complaint.date }}</p>
-                <p><strong>Channel:</strong> {{ complaint.channel }}</p>
                 <p><strong>Country:</strong> {{ complaint.country }}</p>
                 <p><strong>Person:</strong> {{ complaint.person }}</p>
-                <p><strong>Case Type:</strong> {{ complaint.case_type }}</p>
+                <p><strong>Type:</strong> {{ complaint.case_category }}</p>
                 <p><strong>Series:</strong> {{ complaint.series }}</p>
                 <p><strong>Material:</strong> {{ complaint.material }}</p>
                 <p><strong>Brand:</strong> {{ complaint.brand }}</p>
@@ -491,7 +490,6 @@ body.light-mode .action-buttons a {
                 <p><strong>Description:</strong> {{ complaint.complaint_description }}</p>
                 <p><strong>Factory Justification:</strong> {{ complaint.justification_from_factory }}</p>
                 <p><strong>Factory Action:</strong> {{ complaint.action_from_factory }}</p>
-                <p><strong>Batch Order:</strong> {{ complaint.batch_order }}</p>
                 <p><strong>Status:</strong> {{ complaint.status }}</p>
                 <p><strong>Media Files:</strong> {{ complaint.media_files.count }} file(s)</p>
                 
