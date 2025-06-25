@@ -165,39 +165,21 @@ class SKUUploadForm(forms.Form):
         'csv_file': forms.ClearableFileInput(attrs={'class': 'file-input'}),
     }
 
-# Admin Forms
+from django import forms
 from django.contrib.auth.models import User, Group, Permission
 
 class UserCreationForm(forms.ModelForm):
-    password = forms.CharField(widget=forms.PasswordInput())
-    password_confirm = forms.CharField(widget=forms.PasswordInput(), label="Confirm Password")
-    groups = forms.ModelMultipleChoiceField(
-        queryset=Group.objects.all(),
-        widget=forms.CheckboxSelectMultiple,
-        required=False
-    )
-
+    password = forms.CharField(widget=forms.PasswordInput)
+    
     class Meta:
         model = User
-        fields = ['username', 'email', 'first_name', 'last_name', 'is_staff', 'is_active']
+        fields = ['username', 'email', 'password', 'is_staff', 'is_superuser']
 
-    def clean(self):
-        cleaned_data = super().clean()
-        password = cleaned_data.get('password')
-        password_confirm = cleaned_data.get('password_confirm')
-
-        if password and password_confirm and password != password_confirm:
-            raise forms.ValidationError("Passwords don't match")
-
-        return cleaned_data
-
-class GroupForm(forms.ModelForm):
-    permissions = forms.ModelMultipleChoiceField(
-        queryset=Permission.objects.all(),
-        widget=forms.CheckboxSelectMultiple,
-        required=False
-    )
-
+class GroupCreationForm(forms.ModelForm):
     class Meta:
         model = Group
-        fields = ['name']
+        fields = ['name', 'permissions']
+
+class AssignUserToGroupForm(forms.Form):
+    user = forms.ModelChoiceField(queryset=User.objects.all())
+    group = forms.ModelChoiceField(queryset=Group.objects.all())
