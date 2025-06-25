@@ -157,8 +157,14 @@ def car_details(request):
 @login_required
 def delete_car_detail(request, year_range_id):
     year_range = get_object_or_404(YearRange, id=year_range_id)
-    year_range.delete()
     messages.success(request, 'Vehicle deleted successfully!')
+    ActivityLog.objects.create(
+        user=request.user,
+        action="deleted",
+        object_type="Car",
+        object_name=f"{year_range.sub_model.model.brand.name} {year_range.sub_model.model.name} {year_range.sub_model.name} ({year_range.year_start}-{year_range.year_end})"
+    )
+    year_range.delete()
     return redirect('add_car_details')
 
 @login_required
@@ -274,6 +280,12 @@ def edit_master_setting(request, setting_id):
         form = MasterSettingForm(request.POST, instance=setting)
         if form.is_valid():
             form.save()
+            ActivityLog.objects.create(
+                user=request.user,
+                action="updated",
+                object_type="Master Setting",
+                object_name=setting.category + " - " + setting.name
+            )
             return redirect('master_settings')
     else:
         form = MasterSettingForm(instance=setting)
@@ -285,6 +297,12 @@ def edit_master_setting(request, setting_id):
 @login_required
 def delete_master_setting(request, setting_id):
     setting = get_object_or_404(MasterSetting, id=setting_id)
+    ActivityLog.objects.create(
+        user=request.user,
+        action="deleted",
+        object_type="Master Setting",
+        object_name=setting.category + " - " + setting.name
+    )
     setting.delete()
     return redirect('master_settings')
 
@@ -451,6 +469,12 @@ def edit_complaint(request, complaint_id):
             for file in request.FILES.getlist('media'):
                 ComplaintMedia.objects.create(complaint=complaint, file=file)
 
+            ActivityLog.objects.create(
+                user=request.user,
+                action="updated",
+                object_type="complaint",
+                object_name=complaint_id)
+            
             return redirect('complaint_list')
     else:
         form = ComplaintForm(instance=complaint)
@@ -566,6 +590,13 @@ def upload_car_csv(request):
             if duplicates:
                 messages.warning(request, f"Skipped {len(duplicates)} duplicate layout codes: {', '.join(duplicates)}")
             messages.success(request, f"Successfully added {len(new_entries)} records.")
+
+            ActivityLog.objects.create(
+                user=request.user,
+                action="uploaded",
+                object_type="Car CSV",
+                object_name=f"Uploaded {len(new_entries)} new car records via CSV file"
+            )
             return redirect("upload_car_csv")
     else:
         form = UploadCSVForm()
@@ -626,6 +657,11 @@ def add_sku(request):
                         region=region  # may be None if region doesn't exist
                     )
                     added += 1
+                ActivityLog.objects.create(
+                user=request.user,
+                action="uploaded",
+                object_type="SKU CSV",  
+                object_name=f"Uploaded {added} new SKUs via CSV file")
 
                 upload_feedback = f"{added} SKUs added. {skipped} duplicates skipped."
 
@@ -640,6 +676,12 @@ def add_sku(request):
 @login_required
 def delete_sku(request, sku_id):
     sku = get_object_or_404(SKU, id=sku_id)
+    ActivityLog.objects.create(
+        user=request.user,
+        action="deleted",
+        object_type="SKU",
+        object_name=sku.code
+    )
     sku.delete()
     return redirect('add_sku')
 @login_required
@@ -649,6 +691,12 @@ def edit_sku(request, sku_id):
         form = SKUForm(request.POST, instance=sku)
         if form.is_valid():
             form.save()
+            ActivityLog.objects.create(
+                user=request.user,
+                action="updated",
+                object_type="SKU",
+                object_name=sku.code
+            )
             return redirect('add_sku')
     else:
         form = SKUForm(instance=sku)
