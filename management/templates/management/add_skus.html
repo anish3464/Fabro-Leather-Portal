@@ -1,503 +1,578 @@
-{% include 'management/base.html'%}
-
-<h2>Manage SKUs</h2>
-<body>
-<div class="form-container">
-    <h1>Add New SKU</h1>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Add SKU</button>
-</form>
-</div>
-<div class="form-container">
-<h3>Bulk Upload CSV</h3>
-<form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ upload_form.as_p }}
-    <button type="submit" name="upload_csv">Upload CSV</button>
-</form>
-</div>
-
-{% if upload_feedback %}
-    <p style="color: lightgreen; font-weight: bold;">{{ upload_feedback }}</p>
-{% endif %}
-
-<hr>
-
-    <h1>Existing SKUs</h1>
-    <p>Below is the list of existing SKUs. You can edit or delete them as needed.</p>
-<table border="1" style="margin-top: 20px;">
-    <thead>
-        <tr>
-            <th>SKU Code</th>
-            <th>Description</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for sku in skus %}
-        <tr>
-            <td>{{ sku.code }}</td>
-            <td>{{ sku.description }}</td>
-            <td>
-                <a href="{% url 'edit_sku' sku.id %}" class="action-btn">Edit</a> |
-                <a href="{% url 'delete_sku' sku.id %}" class="action-btn" onclick="return confirm('Are you sure you want to delete this SKU?');">Delete</a>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-</body>
-
-<style>
-/* Dark Background and Base Styles */
-body {
-    text-align: center;
-    background-color: #1e1e2f;
-    color: #ffffff;
-    font-family: 'Times New Roman', Times, serif;
-    margin: 0;
-    padding: 20px;
-}
-h1 {
-    text-align: center;
-    color: #00aaff;
-}
-
-.form-container {
-    width: 80%;
-    max-width: 700px;
-    margin: 5% auto;
-    padding: 20px;
-    background-color: #1f1f1f;
-    border-radius: 10px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-}
-
-h2 {
-    text-align: center;
-    margin-bottom: 20px;
-    color: #ffffff;
-}
-
-button {
-    width: 100%;
-    padding: 10px;
-    margin-top: 20px;
-    background-color: #007bff;
-    border: none;
-    color: #ffffff;
-    font-weight: bold;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-button:hover {
-    background-color: #0056b3;
-}
-
-/* Headers */
-h3 {
-    color: #00aaff;
-    margin-bottom: 10px;
-}
-.action-buttons {
-            display: flex;
-            gap: 10px;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SKU Management - Fabro Leather</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .page-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
         }
-        .action-buttons button, .action-buttons a {
-            background-color: #4f8cff;
-            color: white;
-            padding: 6px 12px;
-            border-radius: 6px;
-            text-decoration: none;
-            border: none;
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--dark-text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        body.light-mode .page-title {
+            color: var(--light-text);
+        }
+
+        .page-subtitle {
+            color: var(--dark-text-secondary);
+            font-size: 1rem;
+        }
+
+        body.light-mode .page-subtitle {
+            color: var(--light-text-secondary);
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-section {
+            background: var(--dark-surface);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            height: fit-content;
+        }
+
+        body.light-mode .form-section {
+            background: var(--light-surface);
+            border-color: #e2e8f0;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: var(--dark-text);
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        body.light-mode .form-label {
+            color: var(--light-text);
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            background-color: var(--dark-card);
+            color: var(--dark-text);
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+        }
+
+        body.light-mode .form-input,
+        body.light-mode .form-textarea {
+            background-color: var(--light-card);
+            color: var(--light-text);
+            border-color: #e2e8f0;
+        }
+
+        .form-input:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .file-upload-area {
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        body.light-mode .file-upload-area {
+            border-color: #cbd5e1;
+        }
+
+        .file-upload-area:hover {
+            border-color: var(--primary-color);
+            background-color: rgba(37, 99, 235, 0.05);
+        }
+
+        .file-upload-icon {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .file-upload-text {
+            color: var(--dark-text-secondary);
+            font-size: 0.875rem;
+        }
+
+        body.light-mode .file-upload-text {
+            color: var(--light-text-secondary);
+        }
+
+        .file-input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
             cursor: pointer;
         }
-/* Form Styling */
-form {
-    background-color: #29293d;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-    margin-bottom: 20px;
-}
 
-form button {
-    background-color: #00aaff;
-    color: #ffffff;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-top: 10px;
-    font-weight: bold;
-    transition: background-color 0.3s;
-}
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            justify-content: center;
+        }
 
-form button:hover {
-    background-color: #0077cc;
-}
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+            color: white;
+            width: 100%;
+        }
 
-/* Input Fields */
-form input[type="text"], form input[type="number"] {
-    width: 80%;
-    padding: 10px;
-    margin: 10px 0;
-    border: 1px solid #444;
-    border-radius: 5px;
-    background-color: #2a2a3d;
-    color: #ffffff;
-    font-size: 16px;
-}
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+        }
 
-/* List Styling */
-ul {
-    background-color: #e3e3f1;
-    border-radius: 10px;
-    color: #ffffff;
-    padding: 15px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-    max-height: 300px;
-    overflow-y: auto;
-}
+        .btn-success {
+            background: linear-gradient(135deg, var(--success-color), #059669);
+            color: white;
+            width: 100%;
+        }
 
-ul li {
-    background-color: #000000;
-    color: #ffffff;
-    padding: 10px;
-    border-radius: 5px;
-    margin-bottom: 10px;
-    transition: background-color 0.3s;
-}
+        .btn-success:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+        }
 
-ul li:hover {
-    background-color: #4c4cb8;
-}
+        .feedback-message {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            color: #6ee7b7;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
 
-/* Scrollbar Styles */
-ul::-webkit-scrollbar {
-    width: 8px;
-}
+        .table-section {
+            background: var(--dark-surface);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            grid-column: 1 / -1;
+        }
 
-ul::-webkit-scrollbar-thumb {
-    background-color: #444466;
-    border-radius: 4px;
-}
+        body.light-mode .table-section {
+            background: var(--light-surface);
+            border-color: #e2e8f0;
+        }
 
-ul::-webkit-scrollbar-track {
-    background-color: #29293d;
-}
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-    body {
-        padding: 10px;
-    }
-}
-    .form-container {
-        width: 95%;
-        padding: 15px;
-    }
+        .table-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--dark-text);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
 
-.topbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background-color: #2a2a3d;
-    padding: 15px 30px;
-    border-bottom: 2px solid #444;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.5);
-}
+        body.light-mode .table-title {
+            color: var(--light-text);
+        }
 
-.topbar .logo h2 {
-    color: #ffffff;
-    margin: 0;
-}
+        .search-input {
+            padding: 0.5rem 1rem;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            background-color: var(--dark-card);
+            color: var(--dark-text);
+            font-size: 0.875rem;
+            width: 300px;
+        }
 
+        body.light-mode .search-input {
+            background-color: var(--light-card);
+            color: var(--light-text);
+            border-color: #e2e8f0;
+        }
 
-/* Content Styles */
-.content {
-    max-width: 900px;
-    margin: 30px auto;
-    padding: 20px;
-    z-index: 100;
-    background-color: #2a2a3d;
-    border-radius: 12px;
-    box-shadow: 0 0 15px rgba(0,0,0,0.4);
-}
+        .table-container {
+            overflow-x: auto;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
 
-.nav-left, .nav-right {
-        display: flex;
-        align-items: center;
-    }
+        body.light-mode .table-container {
+            border-color: #e2e8f0;
+        }
 
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 9999;
-    background: rgba(0, 0, 0, 0.6);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/* Modal Box */
-.modal-box {
-    background: #1e1e1e;
-    border: 1px solid #444;
-    color: #fff;
-    width: 400px;
-    border-radius: 8px;
-    overflow: hidden;
-    animation: fadeIn 0.3s ease-in-out;
-}
-
-/* Modal Header */
-.modal-header {
-    padding: 10px 20px;
-    background: #2a2a2a;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-/* Modal Body */
-.modal-body {
-    padding: 20px;
-    text-align: center;
-}
-
-/* Modal Footer */
-.modal-footer {
-    padding: 10px 20px;
-    background: #2a2a2a;
-    text-align: right;
-}
-
-/* Close Button */
-.modal-close {
-    cursor: pointer;
-    font-size: 24px;
-}
-
-/* Fade Animation */
-@keyframes fadeIn {
-    from { opacity: 0; transform: scale(0.95); }
-    to { opacity: 1; transform: scale(1); }
-}
-
-table {
+        .table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
         }
 
-        th, td {
-            padding: 10px;
+        .table th {
+            background: var(--dark-card);
+            color: var(--dark-text);
+            font-weight: 600;
+            padding: 1rem;
             text-align: left;
-            border-bottom: 1px solid #ddd;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.875rem;
         }
 
-        th {
-            background-color: #f2f2f2;
-            color: #333;
+        body.light-mode .table th {
+            background: var(--light-card);
+            color: var(--light-text);
+            border-bottom-color: #e2e8f0;
         }
 
-.delete-button {
-    color: red;
-    text-decoration: none;
-    font-size: 18px;
-}
+        .table td {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--dark-text-secondary);
+            font-size: 0.875rem;
+        }
 
-.delete-button:hover {
-    text-decoration: underline;
-    color: darkred;
-}
+        body.light-mode .table td {
+            color: var(--light-text-secondary);
+            border-bottom-color: #f1f5f9;
+        }
 
-body.light-mode {
-    background-color:rgb(245, 245, 245);
-    color: #000;
-}
-body.light-mode h1,
-body.light-mode h2,
-body.light-mode h3 {
-    color: #0077cc;
-}
-body.light-mode .form-container {
-    background-color:rgb(146, 236, 248);
-    color: #000;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-}
-body.light-mode form {
-    background-color:rgb(171, 211, 245);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-}
-body.light-mode form button {
-    background-color: #007bff;
-    color: #fff;
-}
-body.light-mode form button:hover {
-    background-color: #0056b3;
-}
-body.light-mode form input[type="text"],
-body.light-mode form input[type="number"] {
-    background-color: #fff;
-    color: #000;
-    border: 1px solid #ccc;
-}
-body.light-mode ul {
-    background-color: #fff;
-    color: #000;
-}
-body.light-mode ul li {
-    background-color: #f5f5f5;
-    color: #000;
-}
-body.light-mode ul li:hover {
-    background-color: #e0e0ff;
-}
-body.light-mode ul::-webkit-scrollbar-track {
-    background-color: #ddd;
-}
-body.light-mode ul::-webkit-scrollbar-thumb {
-    background-color: #bbb;
-}
-body.light-mode .delete-button {
-    color: #d10000;
-}
-body.light-mode .delete-button:hover {
-    color: #b30000;
-}
-body.light-mode .topbar {
-    background-color: #ffffff;
-    color: #000;
-    border-bottom: 2px solid #ccc;
-}
-body.light-mode .topbar .logo h2 {
-    color: #000;
-}
-body.light-mode .nav-links a {
-    color: #333;
-}
-body.light-mode .nav-links a:hover {
-    background-color: #ddd;
-}
-body.light-mode .content {
-    background-color: #ffffff;
-    color: #000;
-    box-shadow: 0 0 15px rgba(0,0,0,0.1);
-}
-body.light-mode .modal-overlay {
-    background: rgba(0, 0, 0, 0.4);
-}
-body.light-mode .modal-box {
-    background: #fff;
-    color: #000;
-    border: 1px solid #ccc;
-}
-body.light-mode .modal-header,
-body.light-mode .modal-footer {
-    background: #f0f0f0;
-}
-body.light-mode .car-table {
-    background-color: #fff;
-    color: #000;
-}
-body.light-mode .car-table th {
-    background-color: #f0f0f0;
-}
+        .table tr:hover {
+            background-color: rgba(37, 99, 235, 0.05);
+        }
 
-/* Modal Overlay */
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 9999;
-    background: rgba(0, 0, 0, 0.6);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
 
-/* Modal Box */
-.modal-box {
-    background: #1e1e1e;
-    border: 1px solid #444;
-    color: #fff;
-    width: 400px;
-    border-radius: 8px;
-    overflow: hidden;
-    animation: fadeIn 0.3s ease-in-out;
-}
+        .action-btn {
+            padding: 0.5rem;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: white;
+            font-size: 0.75rem;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 2rem;
+            height: 2rem;
+        }
 
-/* Modal Header */
-.modal-header {
-    padding: 10px 20px;
-    background: #2a2a2a;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
+        .action-btn.edit {
+            background-color: var(--warning-color);
+        }
 
-/* Modal Body */
-.modal-body {
-    padding: 20px;
-    text-align: center;
-}
+        .action-btn.delete {
+            background-color: var(--error-color);
+        }
 
-/* Modal Footer */
-.modal-footer {
-    padding: 10px 20px;
-    background: #2a2a2a;
-    text-align: right;
-}
+        .action-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
 
-/* Close Button */
-.modal-close {
-    cursor: pointer;
-    font-size: 24px;
-}
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--dark-text-secondary);
+        }
 
-/* Fade Animation */
-@keyframes fadeIn {
-    from { opacity: 0; transform: scale(0.95); }
-    to { opacity: 1; transform: scale(1); }
-}
-.car-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-    color: #fff;
-    background-color: #2a2a2a;
-    border: 1px solid #444;
-}
+        body.light-mode .empty-state {
+            color: var(--light-text-secondary);
+        }
 
-.car-table th, .car-table td {
-    padding: 10px;
-    border: 1px solid #444;
-    text-align: center;
-}
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
 
-.car-table th {
-    background-color: #1e1e1e;
-    font-weight: bold;
-}
+        @media (max-width: 1024px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
 
-.delete-button {
-    color: red;
-    text-decoration: none;
-    font-size: 18px;
-}
+        @media (max-width: 768px) {
+            .page-container {
+                padding: 1rem;
+            }
 
-.delete-button:hover {
-    text-decoration: underline;
-}
-</style>
+            .form-section,
+            .table-section {
+                padding: 1.5rem;
+            }
+
+            .table-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: stretch;
+            }
+
+            .search-input {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    {% include 'management/base.html' %}
+    
+    <div class="page-container">
+        <div class="page-header">
+            <h1 class="page-title">
+                <i class="fas fa-barcode"></i>
+                SKU Management
+            </h1>
+            <p class="page-subtitle">Manage product SKUs and inventory with bulk upload capabilities</p>
+        </div>
+
+        <div class="content-grid">
+            <!-- Add SKU Form -->
+            <div class="form-section">
+                <h2 class="section-title">
+                    <i class="fas fa-plus-circle"></i>
+                    Add New SKU
+                </h2>
+
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="form-group">
+                        <label class="form-label">SKU</label>
+                        {{ form.code}}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Description</label>
+                        {{ form.description }}
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Region</label>
+                        {{ form.region }}
+                    </div>
+
+                    <button type="submit" name="add_sku" class="btn btn-primary">
+                        <i class="fas fa-save"></i>
+                        Add SKU
+                    </button>
+                </form>
+            </div>
+
+            <!-- Bulk Upload Form -->
+            <div class="form-section">
+                <h2 class="section-title">
+                    <i class="fas fa-upload"></i>
+                    Bulk Upload CSV
+                </h2>
+
+                {% if upload_feedback %}
+                    <div class="feedback-message">
+                        <i class="fas fa-check-circle"></i>
+                        {{ upload_feedback }}
+                    </div>
+                {% endif %}
+
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="form-group">
+                        <label class="form-label">CSV File</label>
+                        <div class="file-upload-area">
+                            <div class="file-upload-icon">
+                                <i class="fas fa-file-csv"></i>
+                            </div>
+                            <div class="file-upload-text">
+                                <strong>Click to upload</strong> or drag and drop<br>
+                                CSV file with code and description columns
+                            </div>
+                            {{ upload_form.csv_file }}
+                        </div>
+                    </div>
+
+                    <button type="submit" name="upload_csv" class="btn btn-success">
+                        <i class="fas fa-upload"></i>
+                        Upload CSV
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- SKU List -->
+        <div class="table-section">
+            <div class="table-header">
+                <h2 class="table-title">
+                    <i class="fas fa-list"></i>
+                    Existing SKUs ({{ skus.count }})
+                </h2>
+                <input type="text" id="searchInput" placeholder="Search SKUs..." class="search-input">
+            </div>
+
+            {% if skus %}
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>SKU</th>
+                                <th>Description</th>
+                                <th>Region</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="skuTableBody">
+                            {% for sku in skus %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td><strong>{{ sku.code }}</strong></td>
+                                <td>{{ sku.description|default:"-" }}</td>
+                                <td>{{ sku.region|default:"-" }}</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <a href="{% url 'edit_sku' sku.id %}" class="action-btn edit" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="{% url 'delete_sku' sku.id %}" class="action-btn delete" title="Delete"
+                                           onclick="return confirm('Are you sure you want to delete this SKU?');">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        
+                        <i class="fas fa-barcode"></i>
+                    </div>
+                    <h3>No SKUs added yet</h3>
+                    <p>Add your first SKU using the form above or upload a CSV file.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const rows = document.querySelectorAll('#skuTableBody tr');
+            
+            rows.forEach(row => {
+                const code = row.cells[1].textContent.toLowerCase();
+                const description = row.cells[2].textContent.toLowerCase();
+                
+                if (code.includes(searchTerm) || description.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+
+        // File upload handling
+        const fileInput = document.querySelector('.file-input');
+        const uploadArea = document.querySelector('.file-upload-area');
+
+        if (fileInput && uploadArea) {
+            fileInput.addEventListener('change', function() {
+                const files = this.files;
+                if (files.length > 0) {
+                    uploadArea.style.borderColor = 'var(--success-color)';
+                    uploadArea.style.backgroundColor = 'rgba(16, 185, 129, 0.1)';
+                    document.querySelector('.file-upload-text').innerHTML = 
+                        `<strong>${files[0].name}</strong><br>Ready to upload`;
+                }
+            });
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add active nav state
+            const skuLink = document.querySelector('a[href="{% url 'add_sku' %}"]');
+            if (skuLink) {
+                skuLink.classList.add('active');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -4,19 +4,26 @@ from django.http import JsonResponse
 from .forms import ComplaintForm
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Brand, Model, SubModel, YearRange, ComplaintMedia
+from .models import Brand, Model, SubModel, YearRange, ComplaintMedia, MasterSetting, SKU, Complaint
 from .forms import CarDetailsForm
 from django.contrib import messages
 import os
 from django.db.models import Q
-from .models import Complaint, Brand
 from django.utils.dateparse import parse_date
 from collections import Counter
 from django.db.models import Count
+from datetime import datetime
 
 @login_required
 def index(request):
-    return render(request, 'management/index.html')
+    # Get dashboard statistics
+    context = {
+        'total_complaints': Complaint.objects.count(),
+        'total_vehicles': YearRange.objects.count(),
+        'total_skus': SKU.objects.count(),
+        'total_settings': MasterSetting.objects.count(),
+    }
+    return render(request, 'management/index.html', context)
 
 
 from django.contrib import messages
@@ -79,6 +86,7 @@ def add_car_details(request):
                     number_of_doors=number_of_doors,
                     layout_code=layout_code
                 )
+                messages.success(request, 'Vehicle added successfully!')
                 return redirect('add_car_details')
     else:
         form = CarDetailsForm()
@@ -137,6 +145,7 @@ def car_details(request):
 def delete_car_detail(request, year_range_id):
     year_range = get_object_or_404(YearRange, id=year_range_id)
     year_range.delete()
+    messages.success(request, 'Vehicle deleted successfully!')
     return redirect('add_car_details')
 
 @login_required
@@ -167,6 +176,14 @@ def edit_car_detail(request, car_id):
             number_of_seats = form.cleaned_data["number_of_seats"]
             number_of_doors = form.cleaned_data["number_of_doors"]
 
+            # Check for layout code duplication (excluding current record)
+            if YearRange.objects.filter(layout_code=layout_code).exclude(id=car_id).exists():
+                messages.error(request, 'Layout code already exists. Please use a unique layout code.')
+                return render(request, 'management/edit_car_detail.html', {
+                    'form': form,
+                    'car_id': car_id,
+                })
+
             brand, _ = Brand.objects.get_or_create(name=brand_name)
             model, _ = Model.objects.get_or_create(brand=brand, name=model_name)
 
@@ -183,6 +200,7 @@ def edit_car_detail(request, car_id):
             year_range.layout_code = layout_code
             year_range.save()
 
+            messages.success(request, 'Vehicle updated successfully!')
             return redirect('add_car_details')
     else:
         form = CarDetailsForm(initial=initial_data)
@@ -197,9 +215,14 @@ def edit_car_detail(request, car_id):
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import MasterSetting
 from .forms import MasterSettingForm
+from django.contrib.auth.decorators import user_passes_test
 
 @login_required
 def master_settings(request):
+    if not request.user.is_superuser:
+        messages.error(request, "This page is restricted to administrators only.")
+        return redirect('index')
+    
     if request.method == "POST":
         form = MasterSettingForm(request.POST)
         if form.is_valid():
@@ -245,6 +268,10 @@ def add_complaint(request):
     return render(request, 'management/add_complaint.html', {'form': form})
 
 @login_required
+
+def get_brands(request):
+    brands = Brand.objects.all().values('id', 'name')
+    return JsonResponse(list(brands), safe=False)
 def get_models(request, brand_id):
     models = Model.objects.filter(brand_id=brand_id).values('id', 'name')
     return JsonResponse(list(models), safe=False)
@@ -265,6 +292,7 @@ def complaint_list(request):
     selected_brand = request.GET.get('brand')
     selected_country = request.GET.get('country')
     selected_status = request.GET.get('status')
+    selected_priority = request.GET.get('priority')
     selected_channel = request.GET.get('channel')
     selected_person = request.GET.get('person')
     selected_case_category = request.GET.get('case_category')
@@ -278,6 +306,8 @@ def complaint_list(request):
         complaints = complaints.filter(**filter_kwargs)
     if selected_status:
         complaints = complaints.filter(status=selected_status)
+    if selected_priority:
+        complaints = complaints.filter(priority=selected_priority)
     if selected_channel:
         complaints = complaints.filter(channel=selected_channel)
     if selected_person:
@@ -304,10 +334,11 @@ def complaint_list(request):
     brands = Brand.objects.all()
     countries = MasterSetting.objects.filter(id__in=Complaint.objects.values_list('country', flat=True).distinct())
     channels = MasterSetting.objects.filter(id__in=Complaint.objects.values_list('channel', flat=True).distinct())
-    case_category = MasterSetting.objects.filter(id__in=Complaint.objects.values_list('case_category', flat=True).distinct())
-    case_sub_category = MasterSetting.objects.filter(id__in=Complaint.objects.values_list('case_sub_category', flat=True).distinct())
+    case_categories = MasterSetting.objects.filter(id__in=Complaint.objects.values_list('case_category', flat=True).distinct())
+    case_sub_categories = MasterSetting.objects.filter(id__in=Complaint.objects.values_list('case_sub_category', flat=True).distinct())
     persons = MasterSetting.objects.filter(id__in=Complaint.objects.values_list('person', flat=True).distinct())
     statuses = Complaint.objects.values_list('status', flat=True).distinct()
+    priorities = Complaint.objects.values_list('priority', flat=True).distinct()
     sku = Complaint.objects.values_list('sku__code', flat=True).distinct()
 
     # Status Pie Data
@@ -332,19 +363,20 @@ def complaint_list(request):
         'selected_case_sub_category': selected_case_sub_category,
         'selected_brand': selected_brand,
         'selected_country': selected_country,
-        'selected_status': selected_status,
         'selected_channel': selected_channel,
         'selected_person': selected_person,
         'selected_status': selected_status,
+        'selected_priority': selected_priority,
         'from_date': from_date,
         'to_date': to_date,
         'brands': brands,
         'countries': countries,
         'channels': channels,
-        'case_category': case_category,
-        'case_sub_category': case_sub_category,
+        'case_categories': case_categories,
+        'case_sub_categories': case_sub_categories,
         'persons': persons,
         'statuses': statuses,
+        'priorities': priorities,
         'sku': sku
     })
 
@@ -387,6 +419,7 @@ def edit_complaint(request, complaint_id):
 def delete_complaint(request, complaint_id):
     complaint = get_object_or_404(Complaint, pk=complaint_id)
     complaint.delete()
+    messages.success(request, 'Complaint deleted successfully!')
     return redirect('complaint_list')
 
 
@@ -403,7 +436,7 @@ import pandas as pd
 from django.http import HttpResponse
 from .models import Complaint
 
-login_required
+@login_required
 def export_complaints(request):
     format = request.GET.get('format', 'csv')
 
@@ -428,7 +461,7 @@ def export_complaints(request):
                 complaint.complaint_id,
                 str(complaint.model),
                 complaint.status,
-                complaint.case_type if complaint.case_type else '',
+                complaint.case_category if complaint.case_category else '',
                 complaint.date
             ])
         return response
@@ -498,13 +531,14 @@ from .forms import SKUForm, SKUUploadForm
 def add_sku(request):
     form = SKUForm()
     skus = SKU.objects.all().order_by('code')
+    upload_feedback = ''
 
     if request.method == "POST":
         if "add_sku" in request.POST:
             form = SKUForm(request.POST)
             if form.is_valid():
                 form.save()
-                return redirect('manage_skus')
+                return redirect('add_sku')
 
         elif "upload_csv" in request.POST:
             upload_form = SKUUploadForm(request.POST, request.FILES)
@@ -519,18 +553,31 @@ def add_sku(request):
                 for row in reader:
                     code = row.get('code', '').strip()
                     description = row.get('description', '').strip()
-                    if code and not SKU.objects.filter(code=code).exists():
-                        SKU.objects.create(code=code, description=description)
-                        added += 1
-                    else:
+                    region_name = row.get('region', '').strip()
+
+                    if not code:
+                        continue  # skip rows with no code
+
+                    if SKU.objects.filter(code=code).exists():
                         skipped += 1
+                        continue
+
+                    region = MasterSetting.objects.filter(name=region_name, setting_type='Region').first()
+
+                    SKU.objects.create(
+                        code=code,
+                        description=description,
+                        region=region  # may be None if region doesn't exist
+                    )
+                    added += 1
 
                 upload_feedback = f"{added} SKUs added. {skipped} duplicates skipped."
+
 
     return render(request, 'management/add_skus.html', {
         'form': form,
         'skus': skus,
-        'upload_feedback': upload_feedback if 'upload_feedback' in locals() else '',
+        'upload_feedback': upload_feedback,
         'upload_form': SKUUploadForm(),
     })
 
@@ -554,6 +601,3 @@ def edit_sku(request, sku_id):
         'form': form,
         'sku': sku
     })
-
-
-

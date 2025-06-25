@@ -3,658 +3,662 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Car Details</title>
-    {% comment %} <link rel="stylesheet" href="/static/css/style.css"> {% endcomment %}
-</head>
-{% include 'management/base.html' %}
-<body>
-    <h2>Add Car Details</h2>
-    
-    
+    <title>Vehicle Management - Fabro Leather</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .page-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
 
-    <form method="POST">
-    {% csrf_token %}
-    {% if form.errors %}
-        <div class="error">
-            <p>Please correct the errors below:</p>
-            <ul>
-                {% for field in form %}
-                    {% for error in field.errors %}
-                        <li>{{ error }}</li>
-                    {% endfor %}
-                {% endfor %}
-                {% for error in form.non_field_errors %}
-                    <li>{{ error }}</li>
-                {% endfor %}
-            </ul>
-        </div>
-    {% endif %}
-    {{ form.as_p }}
-
-    <button type="submit">Add Car Details</button>
-    <button  onclick="window.location.href='{% url 'upload_car_csv' %}'">Upload Car CSV</button>
-</form>
-{% if show_duplicate_modal %}
-<div id="duplicateModal" class="modal-overlay" style="display:block;">
-  <div class="modal-box">
-    <div class="modal-header">
-            <h2>Duplicate Car Entry</h2>
-            <span class="close" onclick="this.parentElement.parentElement.style.display='none';">&times;</span>
-    </div>
-    <div class="modal-body">
-    <p>This car overlaps with an existing entry:</p>
-    <p><strong>Brand:</strong> {{ conflicting_car.brand }}</p>
-    <p><strong>Model:</strong> {{ conflicting_car.model }}</p>
-    <p><strong>Sub-Model:</strong> {{ conflicting_car.sub_model }}</p>
-    <p><strong>Year Range:</strong> {{ conflicting_car.year_start }} - {{ conflicting_car.year_end }}</p>
-    </div>
-    <div class="modal-footer">
-        <button onclick="closeDuplicateModal()">OK</button>
-    </div>
-  </div>
-</div>
-{% endif %}
-<!-- Layout Code Duplicate Error Modal -->
- {% if show_layout_code_error_modal %}
-<div id="layoutCodeErrorModal" class="modal-overlay" style="display:block;">
-  <div class="modal-box">
-    <div class="modal-header">
-            <h2>Duplicate Layout Code</h2>
-            <span class="close" onclick="document.getElementById('layoutCodeErrorModal').style.display='none'">&times;</span>
-    </div>
-    <div class="modal-body">
-    <p>The layout code you entered already exists. Please use a unique layout code.</p>
-    </div>
-  </div>
-</div>
-{% endif %}
-
-
-
-<style>
-/* Dark Background and Base Styles */
-body {
-    text-align: center;
-    background-color: #1e1e2f;
-    color: #ffffff;
-    font-family: 'Times New Roman', Times, serif;
-    margin: 0;
-    padding: 20px;
-}
-h1 {
-    text-align: center;
-    color: #00aaff;
-}
-
-.form-container {
-    width: 70%;
-    max-width: 500px;
-    margin: 5% auto;
-    padding: 20px;
-    background-color: #1f1f1f;
-    border-radius: 10px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-}
-
-h2 {
-    text-align: center;
-    margin-bottom: 20px;
-    color: #ffffff;
-}
-
-button {
-    width: 100%;
-    padding: 10px;
-    margin-top: 20px;
-    background-color: #007bff;
-    border: none;
-    color: #ffffff;
-    font-weight: bold;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-button:hover {
-    background-color: #0056b3;
-}
-
-/* Headers */
-h3 {
-    color: #00aaff;
-    margin-bottom: 10px;
-}
-.action-buttons {
+        .page-header {
             display: flex;
-            gap: 10px;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
         }
-        .action-buttons button, .action-buttons a {
-            background-color: #4f8cff;
-            color: white;
-            padding: 6px 12px;
-            border-radius: 6px;
-            text-decoration: none;
-            border: none;
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--dark-text);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        body.light-mode .page-title {
+            color: var(--light-text);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.875rem;
             cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
         }
-/* Form Styling */
-form {
-    background-color: #29293d;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-    margin-bottom: 20px;
-}
 
-form button {
-    background-color: #00aaff;
-    color: #ffffff;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-top: 10px;
-    font-weight: bold;
-    transition: background-color 0.3s;
-}
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+            color: white;
+        }
 
-form button:hover {
-    background-color: #0077cc;
-}
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+        }
 
-/* Input Fields */
-form input[type="text"], form input[type="number"] {
-    background-color: #33334d;
-    color: #ffffff;
-    border: 1px solid #444466;
-    padding: 10px;
-    border-radius: 5px;
-    width: 95%;
-    margin-bottom: 15px;
-}
+        .btn-secondary {
+            background: var(--dark-card);
+            color: var(--dark-text-secondary);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
 
-/* List Styling */
-ul {
-    background-color: #e3e3f1;
-    border-radius: 10px;
-    color: #ffffff;
-    padding: 15px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-    max-height: 300px;
-    overflow-y: auto;
-}
+        body.light-mode .btn-secondary {
+            background: var(--light-card);
+            color: var(--light-text-secondary);
+            border-color: #e2e8f0;
+        }
 
-ul li {
-    background-color: #000000;
-    color: #ffffff;
-    padding: 10px;
-    border-radius: 5px;
-    margin-bottom: 10px;
-    transition: background-color 0.3s;
-}
+        .btn-secondary:hover {
+            background: var(--dark-surface);
+            color: var(--dark-text);
+        }
 
-ul li:hover {
-    background-color: #4c4cb8;
-}
+        body.light-mode .btn-secondary:hover {
+            background: var(--light-surface);
+            color: var(--light-text);
+        }
 
-/* Scrollbar Styles */
-ul::-webkit-scrollbar {
-    width: 8px;
-}
+        .content-grid {
+            display: grid;
+            grid-template-columns: 10fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
 
-ul::-webkit-scrollbar-thumb {
-    background-color: #444466;
-    border-radius: 4px;
-}
+        .form-section {
+            background: var(--dark-surface);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            height: fit-content;
+        }
 
-ul::-webkit-scrollbar-track {
-    background-color: #29293d;
-}
+        body.light-mode .form-section {
+            background: var(--light-surface);
+            border-color: #e2e8f0;
+        }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-    body {
-        padding: 10px;
-    }
-}
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--dark-text);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
 
-.delete-button {
-    color: #ff4d4d;
-    text-decoration: none;
-    margin-left: 15px;
-    font-weight: bold;
-    transition: color 0.3s;
-}
+        body.light-mode .section-title {
+            color: var(--light-text);
+        }
 
-.delete-button:hover {
-    color: #ff0000;
-}
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
 
-.topbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background-color: #2a2a3d;
-    padding: 15px 30px;
-    border-bottom: 2px solid #444;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.5);
-}
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: var(--dark-text);
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+        }
 
-.topbar .logo h2 {
-    color: #ffffff;
-    margin: 0;
-}
+        body.light-mode .form-label {
+            color: var(--light-text);
+        }
 
-.nav-links a {
-    color: #f0f0f0;
-    text-decoration: none;
-    margin-left: 20px;
-    font-weight: 600;
-    padding: 8px 15px;
-    border-radius: 6px;
-    transition: background-color 0.3s;
-}
+        .form-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            background-color: var(--dark-card);
+            color: var(--dark-text);
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+        }
 
-.nav-links a:hover {
-    background-color: #444;
-}
+        body.light-mode .form-input {
+            background-color: var(--light-card);
+            color: var(--light-text);
+            border-color: #e2e8f0;
+        }
 
-/* Content Styles */
-.content {
-    max-width: 900px;
-    margin: 30px auto;
-    padding: 20px;
-    z-index: 100;
-    background-color: #2a2a3d;
-    border-radius: 12px;
-    box-shadow: 0 0 15px rgba(0,0,0,0.4);
-}
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
 
-.nav-left, .nav-right {
-        display: flex;
-        align-items: center;
-    }
+        .error-message {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            color: #fca5a5;
+        }
 
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 9999;
-    background: rgba(0, 0, 0, 0.6);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
+        .error-message ul {
+            margin: 0;
+            padding-left: 1.5rem;
+        }
 
-/* Modal Box */
-.modal-box {
-    background: #1e1e1e;
-    border: 1px solid #444;
-    color: #fff;
-    width: 400px;
-    border-radius: 8px;
-    overflow: hidden;
-    animation: fadeIn 0.3s ease-in-out;
-}
+        .table-section {
+            background: var(--dark-surface);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
 
-/* Modal Header */
-.modal-header {
-    padding: 10px 20px;
-    background: #2a2a2a;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
+        body.light-mode .table-section {
+            background: var(--light-surface);
+            border-color: #e2e8f0;
+        }
 
-/* Modal Body */
-.modal-body {
-    padding: 20px;
-    text-align: center;
-}
+        .search-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
 
-/* Modal Footer */
-.modal-footer {
-    padding: 10px 20px;
-    background: #2a2a2a;
-    text-align: right;
-}
+        .search-input {
+            padding: 0.75rem 1rem;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            background-color: var(--dark-card);
+            color: var(--dark-text);
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+        }
 
-/* Close Button */
-.modal-close {
-    cursor: pointer;
-    font-size: 24px;
-}
+        body.light-mode .search-input {
+            background-color: var(--light-card);
+            color: var(--light-text);
+            border-color: #e2e8f0;
+        }
 
-/* Fade Animation */
-@keyframes fadeIn {
-    from { opacity: 0; transform: scale(0.95); }
-    to { opacity: 1; transform: scale(1); }
-}
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
 
-.upload-button {
-    background-color: #3a3a4f;
-    color: #ffffff;
-    padding: 50px 20px;
-    text-align: center;
-    border-radius: 12px;
-    cursor: pointer;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-    transition: all 0.3s;
-}
-.car-table {
+        .table-container {
+            overflow-x: auto;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        body.light-mode .table-container {
+            border-color: #e2e8f0;
+        }
+
+        .table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
+            min-width: 800px;
         }
 
-        .car-th, .car-td {
-            padding: 10px;
+        .table th {
+            background: var(--dark-card);
+            color: var(--dark-text);
+            font-weight: 600;
+            padding: 1rem;
             text-align: left;
-            border-bottom: 1px solid #ddd;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.875rem;
         }
 
-        .car-th {
-            background-color: #f2f2f2;
-            color: #333;
+        body.light-mode .table th {
+            background: var(--light-card);
+            color: var(--light-text);
+            border-bottom-color: #e2e8f0;
         }
 
-.delete-button {
-    color: red;
-    text-decoration: none;
-    font-size: 18px;
-}
+        .table td {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--dark-text-secondary);
+            font-size: 0.875rem;
+        }
 
-.delete-button:hover {
-    text-decoration: underline;
-    color: darkred;
-}
+        body.light-mode .table td {
+            color: var(--light-text-secondary);
+            border-bottom-color: #f1f5f9;
+        }
 
-body.light-mode {
-    background-color:rgb(245, 245, 245);
-    color: #000;
-}
-body.light-mode h1,
-body.light-mode h2,
-body.light-mode h3 {
-    color: #0077cc;
-}
-body.light-mode .form-container {
-    background-color:rgb(146, 236, 248);
-    color: #000;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-}
-body.light-mode form {
-    background-color:rgb(171, 211, 245);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-}
-body.light-mode form button {
-    background-color: #007bff;
-    color: #fff;
-}
-body.light-mode form button:hover {
-    background-color: #0056b3;
-}
-body.light-mode form input[type="text"],
-body.light-mode form input[type="number"] {
-    background-color: #fff;
-    color: #000;
-    border: 1px solid #ccc;
-}
-body.light-mode ul {
-    background-color: #fff;
-    color: #000;
-}
-body.light-mode ul li {
-    background-color: #f5f5f5;
-    color: #000;
-}
-body.light-mode ul li:hover {
-    background-color: #e0e0ff;
-}
-body.light-mode ul::-webkit-scrollbar-track {
-    background-color: #ddd;
-}
-body.light-mode ul::-webkit-scrollbar-thumb {
-    background-color: #bbb;
-}
-body.light-mode .delete-button {
-    color: #d10000;
-}
-body.light-mode .delete-button:hover {
-    color: #b30000;
-}
-body.light-mode .topbar {
-    background-color: #ffffff;
-    color: #000;
-    border-bottom: 2px solid #ccc;
-}
-body.light-mode .topbar .logo h2 {
-    color: #000;
-}
-body.light-mode .nav-links a {
-    color: #333;
-}
-body.light-mode .nav-links a:hover {
-    background-color: #ddd;
-}
-body.light-mode .content {
-    background-color: #ffffff;
-    color: #000;
-    box-shadow: 0 0 15px rgba(0,0,0,0.1);
-}
-body.light-mode .modal-overlay {
-    background: rgba(0, 0, 0, 0.4);
-}
-body.light-mode .modal-box {
-    background: #fff;
-    color: #000;
-    border: 1px solid #ccc;
-}
-body.light-mode .modal-header,
-body.light-mode .modal-footer {
-    background: #f0f0f0;
-}
-body.light-mode .car-table {
-    background-color: #fff;
-    color: #000;
-}
-body.light-mode .car-table th {
-    background-color: #f0f0f0;
-}
+        .table tr:hover {
+            background-color: rgba(37, 99, 235, 0.05);
+        }
 
-/* Modal Overlay */
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 9999;
-    background: rgba(0, 0, 0, 0.6);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
 
-/* Modal Box */
-.modal-box {
-    background: #1e1e1e;
-    border: 1px solid #444;
-    color: #fff;
-    width: 400px;
-    border-radius: 8px;
-    overflow: hidden;
-    animation: fadeIn 0.3s ease-in-out;
-}
+        .action-btn {
+            padding: 0.5rem;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: white;
+            font-size: 0.75rem;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 2rem;
+            height: 2rem;
+        }
 
-/* Modal Header */
-.modal-header {
-    padding: 10px 20px;
-    background: #2a2a2a;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
+        .action-btn.edit {
+            background-color: var(--warning-color);
+        }
 
-/* Modal Body */
-.modal-body {
-    padding: 20px;
-    text-align: center;
-}
+        .action-btn.delete {
+            background-color: var(--error-color);
+        }
 
-/* Modal Footer */
-.modal-footer {
-    padding: 10px 20px;
-    background: #2a2a2a;
-    text-align: right;
-}
+        .action-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
 
-/* Close Button */
-.modal-close {
-    cursor: pointer;
-    font-size: 24px;
-}
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+        }
 
-/* Fade Animation */
-@keyframes fadeIn {
-    from { opacity: 0; transform: scale(0.95); }
-    to { opacity: 1; transform: scale(1); }
-}
-.car-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-    color: #fff;
-    background-color: #2a2a2a;
-    border: 1px solid #444;
-}
+        .modal-content {
+            background: var(--dark-surface);
+            margin: 10% auto;
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 500px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
 
-.car-table th, .car-table td {
-    padding: 10px;
-    border: 1px solid #444;
-    text-align: center;
-}
+        body.light-mode .modal-content {
+            background: var(--light-surface);
+            border-color: #e2e8f0;
+        }
 
-.car-table th {
-    background-color: #1e1e1e;
-    font-weight: bold;
-}
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
 
-.delete-button {
-    color: red;
-    text-decoration: none;
-    font-size: 18px;
-}
+        body.light-mode .modal-header {
+            border-bottom-color: #e2e8f0;
+        }
 
-.delete-button:hover {
-    text-decoration: underline;
-}
-</style>
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--error-color);
+        }
 
-<script>
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--dark-text-secondary);
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
 
-document.addEventListener("DOMContentLoaded", function () {
-    const brandInput = document.getElementById("brandInput");
-    const modelInput = document.getElementById("modelInput");
-    const subModelInput = document.getElementById("subModelInput");
-    const rows = document.querySelectorAll("#carTableBody tr");
+        body.light-mode .close-btn {
+            color: var(--light-text-secondary);
+        }
 
-    function filterTable() {
-        const brandVal = brandInput.value.trim().toLowerCase();
-        const modelVal = modelInput.value.trim().toLowerCase();
-        const subModelVal = subModelInput.value.trim().toLowerCase();
+        .close-btn:hover {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--error-color);
+        }
 
-        rows.forEach(row => {
-            const brand = row.getAttribute("data-brand");
-            const model = row.getAttribute("data-model");
-            const subModel = row.getAttribute("data-submodel");
+        .modal-body {
+            color: var(--dark-text-secondary);
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
 
-            const matchBrand = !brandVal || brand.includes(brandVal);
-            const matchModel = !modelVal || model.includes(modelVal);
-            const matchSubModel = !subModelVal || subModel.includes(subModelVal);
+        body.light-mode .modal-body {
+            color: var(--light-text-secondary);
+        }
 
-            row.style.display = (matchBrand && matchModel && matchSubModel) ? "" : "none";
-        });
-    }
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
 
-    brandInput.addEventListener("input", filterTable);
-    modelInput.addEventListener("input", filterTable);
-    subModelInput.addEventListener("input", filterTable);
-});
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--dark-text-secondary);
+        }
 
+        body.light-mode .empty-state {
+            color: var(--light-text-secondary);
+        }
 
-function closeDuplicateModal() {
-    document.getElementById("duplicateModal").style.display = "none";
-}
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
 
-document.getElementById("brandSearchInput").addEventListener("input", function () {
-        const input = this.value.toLowerCase();
-        const rows = document.querySelectorAll(".car-table tbody tr");
-
-        rows.forEach(row => {
-            const brandCell = row.querySelector("td:nth-child(1)");
-            const brand = brandCell ? brandCell.textContent.toLowerCase() : "";
-
-            // Show the row if input is empty or brand matches input
-            if (!input || brand.includes(input)) {
-                row.style.display = "";
-            } else {
-                row.style.display = "none";
+        @media (max-width: 1024px) {
+            .content-grid {
+                grid-template-columns: 1fr;
             }
-        });
-    });
-document.getElementById("modelSearchInput").addEventListener("input", function () {
-        const input = this.value.toLowerCase();
-        const rows = document.querySelectorAll(".car-table tbody tr");
+        }
 
-        rows.forEach(row => {
-            const modelCell = row.querySelector("td:nth-child(2)");
-            const model = modelCell ? modelCell.textContent.toLowerCase() : "";
-
-            // Show the row if input is empty or model matches input
-            if (!input || model.includes(input)) {
-                row.style.display = "";
-            } else {
-                row.style.display = "none";
+        @media (max-width: 768px) {
+            .page-container {
+                padding: 1rem;
             }
-        });
-    }); 
-document.getElementById("subModelSearchInput").addEventListener("input", function () {
-        const input = this.value.toLowerCase();
-        const rows = document.querySelectorAll(".car-table tbody tr");
 
-        rows.forEach(row => {
-            const subModelCell = row.querySelector("td:nth-child(3)");
-            const subModel = subModelCell ? subModelCell.textContent.toLowerCase() : "";
-
-            // Show the row if input is empty or sub-model matches input
-            if (!input || subModel.includes(input)) {
-                row.style.display = "";
-            } else {
-                row.style.display = "none";
+            .page-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: stretch;
             }
-        });
-    }); 
 
-function closeDuplicateModal() {
-    document.getElementById("duplicateModal").style.display = "none";
-}
-</script>
+            .header-actions {
+                justify-content: center;
+            }
 
-{% if show_duplicate_modal %}
-<script>
-    window.onload = function() {
-        document.getElementById("duplicateModal").style.display = "flex";
-    }
-</script>
-{% endif %}
+            .form-section,
+            .table-section {
+                padding: 1.5rem;
+            }
 
+            .search-bar {
+                grid-template-columns: 1fr;
+            }
 
+            .btn {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    {% include 'management/base.html' %}
     
+    <div class="page-container">
+        <div class="page-header">
+            <h1 class="page-title">
+                <i class="fas fa-car"></i>
+                Vehicle Management
+            </h1>
+            <div class="header-actions">
+                <a href="{% url 'upload_car_csv' %}" class="btn btn-secondary">
+                    <i class="fas fa-upload"></i>
+                    Upload CSV
+                </a>
+                <a href="{% url 'car_details' %}" class="btn btn-primary">
+                    <i class="fas fa-database"></i>
+                    View Cars
+                </a>
+            </div>
+        </div>
 
-    
+        <div class="content-grid">
+            <!-- Add Vehicle Form -->
+            <div class="form-section">
+                <h2 class="section-title">
+                    <i class="fas fa-plus-circle"></i>
+                    Add New Vehicle
+                </h2>
+
+                {% if form.errors %}
+                    <div class="error-message">
+                        <strong>Please correct the errors below:</strong>
+                        <ul>
+                            {% for field in form %}
+                                {% for error in field.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            {% endfor %}
+                            {% for error in form.non_field_errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+
+                <form method="POST">
+                    {% csrf_token %}
+                    
+                    <div class="form-group">
+                        <label class="form-label">Layout Code</label>
+                        <input type="text" name="layout_code" class="form-input" 
+                               placeholder="Enter unique layout code" 
+                               value="{{ form.layout_code.value|default:'' }}" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Brand Name</label>
+                            <input type="text" name="brand_name" class="form-input" 
+                                   placeholder="e.g., BMW, Mercedes" 
+                                   value="{{ form.brand_name.value|default:'' }}" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Model Name</label>
+                            <input type="text" name="model_name" class="form-input" 
+                                   placeholder="e.g., X5, C-Class" 
+                                   value="{{ form.model_name.value|default:'' }}" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Sub-Model Name (Optional)</label>
+                        <input type="text" name="sub_model_name" class="form-input" 
+                               placeholder="e.g., Sport, Luxury" 
+                               value="{{ form.sub_model_name.value|default:'' }}">
+                    </div>
+                    
+                    <div class="form-group">
+                            <label class="form-label">Year Start</label>
+                            <input type="number" name="year_start" class="form-input" 
+                                   placeholder="2020" min="1900" max="2100"
+                                   value="{{ form.year_start.value|default:'' }}" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Year End</label>
+                            <input type="number" name="year_end" class="form-input" 
+                                   placeholder="2025" min="1900" max="2100"
+                                   value="{{ form.year_end.value|default:'' }}" required>
+                    </div>
+                    
+                    <div class="form-group">
+                            <label class="form-label">Number of Seats</label>
+                            <input type="number" name="number_of_seats" class="form-input" 
+                                   placeholder="5" min="1"
+                                   value="{{ form.number_of_seats.value|default:'' }}" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Number of Doors</label>
+                            <input type="number" name="number_of_doors" class="form-input" 
+                                   placeholder="4" min="1"
+                                   value="{{ form.number_of_doors.value|default:'' }}" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">
+                        <i class="fas fa-save"></i>
+                        Add Vehicle
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Duplicate Modal -->
+    {% if show_duplicate_modal %}
+    <div id="duplicateModal" class="modal" style="display: block;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Duplicate Vehicle Entry
+                </h2>
+                <button class="close-btn" onclick="closeDuplicateModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>This vehicle configuration overlaps with an existing entry:</p>
+                <div style="background: var(--dark-card); padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+                    <p><strong>Brand:</strong> {{ conflicting_car.brand }}</p>
+                    <p><strong>Model:</strong> {{ conflicting_car.model }}</p>
+                    <p><strong>Sub-Model:</strong> {{ conflicting_car.sub_model }}</p>
+                    <p><strong>Year Range:</strong> {{ conflicting_car.year_start }} - {{ conflicting_car.year_end }}</p>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-primary" onclick="closeDuplicateModal()">
+                    <i class="fas fa-check"></i>
+                    OK
+                </button>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Layout Code Error Modal -->
+    {% if show_layout_code_error_modal %}
+    <div id="layoutCodeErrorModal" class="modal" style="display: block;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Duplicate Layout Code
+                </h2>
+                <button class="close-btn" onclick="closeLayoutCodeErrorModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>The layout code you entered already exists. Please use a unique layout code.</p>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-primary" onclick="closeLayoutCodeErrorModal()">
+                    <i class="fas fa-check"></i>
+                    OK
+                </button>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <script>
+        // Search functionality
+        function setupSearch() {
+            const brandInput = document.getElementById("brandSearchInput");
+            const modelInput = document.getElementById("modelSearchInput");
+            const subModelInput = document.getElementById("subModelSearchInput");
+            const rows = document.querySelectorAll(".table tbody tr");
+
+            function filterTable() {
+                const brandVal = brandInput.value.trim().toLowerCase();
+                const modelVal = modelInput.value.trim().toLowerCase();
+                const subModelVal = subModelInput.value.trim().toLowerCase();
+
+                rows.forEach(row => {
+                    const layoutCode = row.cells[1].textContent.toLowerCase();
+                    const brand = row.cells[2].textContent.toLowerCase();
+                    const model = row.cells[3].textContent.toLowerCase();
+                    const subModel = row.cells[4].textContent.toLowerCase();
+
+                    const matchBrand = !brandVal || layoutCode.includes(brandVal);
+                    const matchModel = !modelVal || brand.includes(modelVal);
+                    const matchSubModel = !subModelVal || model.includes(subModelVal);
+
+                    row.style.display = (matchBrand && matchModel && matchSubModel) ? "" : "none";
+                });
+            }
+
+            brandInput.addEventListener("input", filterTable);
+            modelInput.addEventListener("input", filterTable);
+            subModelInput.addEventListener("input", filterTable);
+        }
+
+        // Modal functions
+        function closeDuplicateModal() {
+            document.getElementById("duplicateModal").style.display = "none";
+        }
+
+        function closeLayoutCodeErrorModal() {
+            document.getElementById("layoutCodeErrorModal").style.display = "none";
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            setupSearch();
+            
+            // Add active nav state
+            const vehicleLink = document.querySelector('a[href="{% url 'add_car_details' %}"]');
+            if (vehicleLink) {
+                vehicleLink.classList.add('active');
+            }
+        });
+
+        // Close modals when clicking outside
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = "none";
+            }
+        }
+    </script>
 </body>
-
 </html>

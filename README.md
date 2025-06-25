@@ -75,7 +75,7 @@ fabro_leather/
 1. **Clone the repository**
 
 ```bash
-git clone https://github.com/anish3464/Fabro-Leather-Portal
+git clone https://github.com/yourusername/fabro-leather.git
 cd fabro-leather
 ```
 
