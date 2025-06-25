@@ -2,6 +2,9 @@ from django.db import models
 import os
 import random
 import string
+from django.contrib.auth.models import User
+from django.utils import timezone
+
 class Brand(models.Model):
     name = models.CharField(max_length=100, unique=True)
 
@@ -74,6 +77,7 @@ class MasterSetting(models.Model):
     
 def generate_complaint_id():
     return ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
+
 class Complaint(models.Model):
     complaint_id = models.CharField(primary_key=True, max_length=10, unique=True, default=generate_complaint_id)
     date = models.DateField(auto_now_add=False)
@@ -156,6 +160,46 @@ class ComplaintMedia(models.Model):
 
     def __str__(self):
         return os.path.basename(self.file.name)
+
+# Activity Log Model
+class ActivityLog(models.Model):
+    ACTION_CHOICES = [
+        ('CREATE', 'Created'),
+        ('UPDATE', 'Updated'),
+        ('DELETE', 'Deleted'),
+        ('LOGIN', 'Logged In'),
+        ('LOGOUT', 'Logged Out'),
+    ]
     
+    OBJECT_CHOICES = [
+        ('COMPLAINT', 'Complaint'),
+        ('VEHICLE', 'Vehicle'),
+        ('SKU', 'SKU'),
+        ('MASTER_SETTING', 'Master Setting'),
+        ('USER', 'User'),
+    ]
+    
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    action = models.CharField(max_length=10, choices=ACTION_CHOICES)
+    object_type = models.CharField(max_length=20, choices=OBJECT_CHOICES)
+    object_id = models.CharField(max_length=100, blank=True, null=True)
+    object_name = models.CharField(max_length=200)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    ip_address = models.GenericIPAddressField(blank=True, null=True)
+    
+    class Meta:
+        ordering = ['-timestamp']
+    
+    def __str__(self):
+        return f"{self.user.username} {self.action} {self.object_type} - {self.object_name}"
 
-
+# User Session Model for tracking active users
+class UserSession(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    session_key = models.CharField(max_length=40, unique=True)
+    login_time = models.DateTimeField(auto_now_add=True)
+    last_activity = models.DateTimeField(auto_now=True)
+    ip_address = models.GenericIPAddressField(blank=True, null=True)
+    
+    def __str__(self):
+        return f"{self.user.username} - {self.login_time}"
