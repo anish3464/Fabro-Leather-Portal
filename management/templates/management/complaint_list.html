@@ -600,7 +600,7 @@
                             <td>{{ complaint.model|default:"-" }}</td>
                             <td>
                                 {% if complaint.year %}
-                                    {{ complaint.year.year_start|stringformat:"02d" }}-{{ complaint.year.year_end|stringformat:"02d" }}
+                                    {{ complaint.year.year_start|stringformat:"s"|slice:"-2:" }}-{{ complaint.year.year_end|stringformat:"s"|slice:"-2:" }}
                                 {% else %}
                                     -
                                 {% endif %}
@@ -705,7 +705,7 @@
                                             <div class="detail-label">Year</div>
                                             <div class="detail-value">
                                                 {% if complaint.year %}
-                                                    {{ complaint.year.year_start|stringformat:"02d" }}-{{ complaint.year.year_end|stringformat:"02d" }}
+                                                    {{ complaint.year.year_start|stringformat:"s"|slice:"-2:" }}-{{ complaint.year.year_end|stringformat:"s"|slice:"-2:" }}
                                                 {% else %}
                                                     -
                                                 {% endif %}

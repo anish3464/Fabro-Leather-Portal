@@ -17,6 +17,7 @@ urlpatterns = [
     path('delete-car-detail/<int:year_range_id>/', views.delete_car_detail, name='delete_car_detail'),
     path('edit-car/<int:car_id>/', views.edit_car_detail, name='edit_car_detail'),
     path('master-settings/', views.master_settings, name='master_settings'),
+    path('edit-master-setting/<int:setting_id>/', views.edit_master_setting, name='edit_master_setting'),
     path('delete-master-setting/<int:setting_id>/', views.delete_master_setting, name='delete_master_setting'),
     path('add-complaint/', views.add_complaint, name='add_complaint'),
     path('api/models/<int:brand_id>/', views.get_models, name='get_models'),
@@ -27,9 +28,8 @@ urlpatterns = [
     path('add-sku/', views.add_sku, name='add_sku'),
     path('delete-sku/<int:sku_id>/', views.delete_sku, name='delete_sku'),
     path('edit-sku/<int:sku_id>/', views.edit_sku, name='edit_sku'),
+    path('admin_panel/', views.admin_panel_view, name='admin_panel'),    
 
-
-    
 
         
 

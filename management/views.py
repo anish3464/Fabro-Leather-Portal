@@ -242,6 +242,22 @@ def master_settings(request):
     })
 
 @login_required
+def edit_master_setting(request, setting_id):
+    setting = get_object_or_404(MasterSetting, id=setting_id)
+
+    if request.method == 'POST':
+        form = MasterSettingForm(request.POST, instance=setting)
+        if form.is_valid():
+            form.save()
+            return redirect('master_settings')
+    else:
+        form = MasterSettingForm(instance=setting)
+
+    return render(request, 'management/edit_master_setting.html', {
+        'form': form,
+        'setting': setting
+    })
+@login_required
 def delete_master_setting(request, setting_id):
     setting = get_object_or_404(MasterSetting, id=setting_id)
     setting.delete()
@@ -600,4 +616,47 @@ def edit_sku(request, sku_id):
     return render(request, 'management/edit_sku.html', {
         'form': form,
         'sku': sku
+    })
+
+from django.contrib.auth.decorators import user_passes_test
+from django.contrib.auth.models import User, Group, Permission
+from django.shortcuts import render, redirect
+from management.models import ActivityLog, UserSession
+from management.forms import UserCreationForm, GroupForm
+
+@user_passes_test(lambda u: u.is_superuser)
+def admin_panel_view(request):
+    users = User.objects.all()
+    groups = Group.objects.all()
+    permissions = Permission.objects.all()
+    activity_logs = ActivityLog.objects.all()[:50]  # Limit to recent 50
+    active_sessions = UserSession.objects.select_related('user')
+
+    user_form = UserCreationForm()
+    group_form = GroupForm()
+
+    if request.method == "POST":
+        if "add_user" in request.POST:
+            user_form = UserCreationForm(request.POST)
+            if user_form.is_valid():
+                user = user_form.save(commit=False)
+                user.set_password(user_form.cleaned_data['password'])
+                user.save()
+                user.groups.set(user_form.cleaned_data['groups'])
+                return redirect('admin_panel')
+
+        elif "add_group" in request.POST:
+            group_form = GroupForm(request.POST)
+            if group_form.is_valid():
+                group_form.save()
+                return redirect('admin_panel')
+
+    return render(request, 'management/admin_panel.html', {
+        "users": users,
+        "groups": groups,
+        "permissions": permissions,
+        "activity_logs": activity_logs,
+        "active_sessions": active_sessions,
+        "user_form": user_form,
+        "group_form": group_form
     })
