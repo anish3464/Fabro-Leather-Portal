@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: fabro-leather
+    env: python
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "python manage.py migrate && python manage.py collectstatic --noinput && gunicorn fabro_leather.wsgi:application"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: DATABASE_URL
+        fromDatabase:
+          name: fabro-leather-db
+          property: connectionString
+      - key: DJANGO_SETTINGS_MODULE
+        value: fabro_leather.settings
+      - key: DEBUG
+        value: "False"
+
+databases:
+  - name: fabro-leather-db
+    databaseName: fabro_leather
+    user: fabro_user
