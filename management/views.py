@@ -754,11 +754,7 @@ def admin_panel_view(request):
     users = User.objects.all()
     groups = Group.objects.prefetch_related('permissions')
     permissions = Permission.objects.all()
-
-    # Get logged-in users
-    sessions = Session.objects.filter(expire_date__gte=now())
-    user_ids = [s.get_decoded().get('_auth_user_id') for s in sessions]
-    active_users = User.objects.filter(id__in=user_ids)
+    active_users = get_active_users()
 
     logs = ActivityLog.objects.select_related('user').order_by('-timestamp')[:20]
 
@@ -766,6 +762,7 @@ def admin_panel_view(request):
         'user_form': user_form,
         'group_form': group_form,
         'assign_form': assign_form,
+        'active_users': active_users,
         'users': users,
         'groups': groups,
         'permissions': permissions,
@@ -846,3 +843,32 @@ def delete_user(request):
             messages.error(request, "User not found.")
 
     return redirect('admin_panel')
+
+
+from django.contrib.sessions.models import Session
+from django.contrib.auth.models import User
+from django.utils.timezone import now
+
+def get_active_users():
+    sessions = Session.objects.filter(expire_date__gte=now())
+    active_users = []
+
+    for session in sessions:
+        data = session.get_decoded()
+        user_id = data.get('_auth_user_id')
+        login_time = data.get('login_time')
+        ip_address = data.get('ip_address', 'N/A')
+
+        if user_id:
+            try:
+                user = User.objects.get(id=user_id)
+                active_users.append({
+                    'user': user,
+                    'login_time': login_time or 'N/A',
+                    'ip': ip_address
+                })
+            except User.DoesNotExist:
+                continue
+
+    return active_users
+

@@ -134,7 +134,7 @@
             position: relative;
         }
 
-        .date-display {
+        .date-input {
             width: 100%;
             padding: 0.75rem 1rem;
             border: 2px solid rgba(255, 255, 255, 0.1);
@@ -144,24 +144,27 @@
             font-size: 0.875rem;
             transition: all 0.2s ease;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
         }
 
-        body.light-mode .date-display {
+        body.light-mode .date-input {
             background-color: var(--light-surface);
             color: var(--light-text);
             border-color: #e2e8f0;
         }
 
-        .date-display:hover {
+        .date-input:focus {
+            outline: none;
             border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
         }
 
         .date-icon {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
             color: var(--dark-text-secondary);
-            font-size: 1rem;
+            pointer-events: none;
         }
 
         body.light-mode .date-icon {
@@ -353,11 +356,8 @@
                     <div class="form-group">
                         <label class="form-label">{{ form.date.label }}</label>
                         <div class="date-input-wrapper">
-                            <div class="date-display" id="dateDisplay" onclick="openDatePicker()">
-                                <span id="dateText">Select Date</span>
-                                <i class="fas fa-calendar-alt date-icon"></i>
-                            </div>
-                            <input type="hidden" name="date" id="hiddenDateInput" required>
+                            <div class="date-input">{{ form.date }}
+                            <i class="fas fa-calendar-alt date-icon"></i></div>
                         </div>
                     </div>
 
@@ -488,11 +488,8 @@
                 <div class="form-group">
                     <label class="form-label">CAD Date</label>
                     <div class="date-input-wrapper">
-                        <div class="date-display" id="cadDateDisplay" onclick="openCadDatePicker()">
-                            <span id="cadDateText">Select CAD Date</span>
-                            <i class="fas fa-calendar-alt date-icon"></i>
-                        </div>
-                        <input type="hidden" name="cad_date" id="hiddenCadDateInput">
+                    <div class="date-input">{{ form.cad_date }}
+                            <i class="fas fa-calendar-alt date-icon"></i></div>
                     </div>
                 </div>
 
@@ -548,6 +545,48 @@
 
     <script>
         // Date picker functionality
+        function initDatePicker() {
+            const dateInput = document.getElementById('dateInput');
+            
+            // Create hidden input for actual form submission
+            const hiddenDateInput = document.createElement('input');
+            hiddenDateInput.type = 'hidden';
+            hiddenDateInput.name = 'date';
+            dateInput.parentNode.appendChild(hiddenDateInput);
+            
+            // Set today's date as default
+            const today = new Date();
+            const formattedDate = formatDateDisplay(today);
+            dateInput.value = formattedDate;
+            hiddenDateInput.value = formatDateForSubmission(today);
+            
+            dateInput.addEventListener('click', function() {
+                const input = document.createElement('input');
+                input.type = 'date';
+                input.style.position = 'absolute';
+                input.style.left = '-9999px';
+                document.body.appendChild(input);
+                
+                // Set current value
+                if (hiddenDateInput.value) {
+                    input.value = hiddenDateInput.value;
+                } else {
+                    input.value = formatDateForSubmission(today);
+                }
+                
+                input.addEventListener('change', function() {
+                    if (this.value) {
+                        const selectedDate = new Date(this.value);
+                        dateInput.value = formatDateDisplay(selectedDate);
+                        hiddenDateInput.value = this.value;
+                    }
+                    document.body.removeChild(this);
+                });
+                
+                input.click();
+            });
+        }
+        
         function formatDateDisplay(date) {
             const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
                            'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -563,70 +602,6 @@
             const day = String(date.getDate()).padStart(2, '0');
             return `${year}-${month}-${day}`;
         }
-
-        function openDatePicker() {
-            const input = document.createElement('input');
-            input.type = 'date';
-            input.style.position = 'absolute';
-            input.style.left = '-9999px';
-            document.body.appendChild(input);
-            
-            // Set current value if exists
-            const hiddenInput = document.getElementById('hiddenDateInput');
-            if (hiddenInput.value) {
-                input.value = hiddenInput.value;
-            } else {
-                // Set today's date as default
-                const today = new Date();
-                input.value = formatDateForSubmission(today);
-            }
-            
-            input.addEventListener('change', function() {
-                if (this.value) {
-                    const selectedDate = new Date(this.value);
-                    document.getElementById('dateText').textContent = formatDateDisplay(selectedDate);
-                    hiddenInput.value = this.value;
-                }
-                document.body.removeChild(this);
-            });
-            
-            input.click();
-        }
-
-        function openCadDatePicker() {
-            const input = document.createElement('input');
-            input.type = 'date';
-            input.style.position = 'absolute';
-            input.style.left = '-9999px';
-            document.body.appendChild(input);
-            
-            // Set current value if exists
-            const hiddenInput = document.getElementById('hiddenCadDateInput');
-            if (hiddenInput.value) {
-                input.value = hiddenInput.value;
-            }
-            
-            input.addEventListener('change', function() {
-                if (this.value) {
-                    const selectedDate = new Date(this.value);
-                    document.getElementById('cadDateText').textContent = formatDateDisplay(selectedDate);
-                    hiddenInput.value = this.value;
-                } else {
-                    document.getElementById('cadDateText').textContent = 'Select CAD Date';
-                    hiddenInput.value = '';
-                }
-                document.body.removeChild(this);
-            });
-            
-            input.click();
-        }
-
-        // Initialize with today's date
-        document.addEventListener('DOMContentLoaded', function() {
-            const today = new Date();
-            document.getElementById('dateText').textContent = formatDateDisplay(today);
-            document.getElementById('hiddenDateInput').value = formatDateForSubmission(today);
-        });
 
         // Dynamic form loading
         function loadDependentData(url, targetId, emptyMessage) {
@@ -696,6 +671,8 @@
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
+            initDatePicker();
+            
             // Add active nav state
             const addComplaintLink = document.querySelector('a[href="{% url 'add_complaint' %}"]');
             if (addComplaintLink) {

@@ -597,21 +597,31 @@ window.onclick = function(event) {
         <!-- Active Users -->
         <div class="admin-section">
             <h2>Active Users</h2>
-            {% if active_sessions %}
-            <div class="active-users-list">
-                {% for session in active_sessions %}
-                <div class="active-user-item">
-                    <div class="user-avatar">{{ session.user.username|first|upper }}</div>
-                    <div class="user-info">
-                        <div class="user-name">{{ session.user.username }}</div>
-                        <div class="user-login-time">Logged in at {{ session.login_time }}</div>
-                    </div>
-                </div>
+            <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Time of Login</th>
+                    <th>IP Address</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for session in active_users %}
+                <tr>
+                    <td>
+                            <strong>{{ session.user.username }}</strong>
+                        </div>
+                    </td>
+                    <td><code>{{ session.ip }}</code></td>
+                    <td>
+                        <em>{{ session.login_time }}</em> 
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5" style="text-align: center; color: #a0a0b8; padding: 40px;">No users found.</td></tr>
                 {% endfor %}
-            </div>
-            {% else %}
-                <p style="color: #a0a0b8; text-align: center; padding: 20px;">No active users currently.</p>
-            {% endif %}
+            </tbody>
+        </table>
         </div>
     </div>
 
@@ -668,7 +678,7 @@ window.onclick = function(event) {
                         </span>
                     </td>
                     <td>
-                        <button onclick="openEditUserModal('{{ user.id }}', '{{ user.username }}', '{{ user.email }}')" class="btn btn-edit">✏️ Edit</button>
+                        <a href="/admin/auth/user/"><button class="btn btn-edit">✏️ Edit</button></a>                        
                         <button onclick="confirmDeleteUser('{{ user.id }}')" class="btn btn-delete">🗑️ Delete</button>
                     </td>
                 </tr>
@@ -702,7 +712,7 @@ window.onclick = function(event) {
                         {% endfor %}
                     </td>
                     <td>
-                        <button onclick="openEditGroupModal('{{ group.id }}', '{{ group.name }}')" class="btn btn-edit">✏️ Edit</button>
+                        <a href="/admin/auth/group/"><button class="btn btn-edit">✏️ Edit</button></a>  
                         <button onclick="confirmDeleteGroup('{{ group.id }}')" class="btn btn-delete">🗑️ Delete</button>
                     </td>
                 </tr>
