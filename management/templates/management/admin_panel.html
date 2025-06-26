@@ -612,9 +612,9 @@ window.onclick = function(event) {
                             <strong>{{ session.user.username }}</strong>
                         </div>
                     </td>
-                    <td><code>{{ session.ip }}</code></td>
+                    <td><em>{{ session.login_time }}</em> </td>
                     <td>
-                        <em>{{ session.login_time }}</em> 
+                        <code>{{ session.ip }}</code>
                     </td>
                 </tr>
                 {% empty %}
