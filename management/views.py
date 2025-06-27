@@ -359,7 +359,6 @@ def complaint_list(request):
     selected_priority = request.GET.get('priority')
     selected_channel = request.GET.get('channel')
     selected_person = request.GET.get('person')
-    selected_case_category = request.GET.get('case_category')
     selected_case_sub_category = request.GET.get('case_sub_category')
 
     from_date = request.GET.get('from_date')
@@ -389,16 +388,12 @@ def complaint_list(request):
     if to_date:
         complaints = complaints.filter(date__lte=parse_date(to_date))
 
-    if selected_case_category:
-        complaints = complaints.filter(case_category=selected_case_category)
-
     if selected_case_sub_category:
         complaints = complaints.filter(case_sub_category=selected_case_sub_category)
 
     brands = Brand.objects.all()
     countries = MasterSetting.objects.filter(id__in=Complaint.objects.values_list('country', flat=True).distinct())
     channels = MasterSetting.objects.filter(id__in=Complaint.objects.values_list('channel', flat=True).distinct())
-    case_categories = MasterSetting.objects.filter(id__in=Complaint.objects.values_list('case_category', flat=True).distinct())
     case_sub_categories = MasterSetting.objects.filter(id__in=Complaint.objects.values_list('case_sub_category', flat=True).distinct())
     persons = MasterSetting.objects.filter(id__in=Complaint.objects.values_list('person', flat=True).distinct())
     statuses = Complaint.objects.values_list('status', flat=True).distinct()
@@ -423,7 +418,6 @@ def complaint_list(request):
         'country_data': country_data,
         'search_query': search_query,
         'search_by': search_by,
-        'selected_case_category': selected_case_category,
         'selected_case_sub_category': selected_case_sub_category,
         'selected_brand': selected_brand,
         'selected_country': selected_country,
@@ -436,7 +430,6 @@ def complaint_list(request):
         'brands': brands,
         'countries': countries,
         'channels': channels,
-        'case_categories': case_categories,
         'case_sub_categories': case_sub_categories,
         'persons': persons,
         'statuses': statuses,
@@ -522,6 +515,14 @@ def export_complaints(request):
         complaints = complaints.filter(status=request.GET['status'])
     if 'case_type' in request.GET:
         complaints = complaints.filter(case_type__name=request.GET['case_type'])
+    if 'from_date' in request.GET:
+        from_date = request.GET['from_date']
+        if from_date:
+            complaints = complaints.filter(date__gte=parse_date(from_date))
+    if 'to_date' in request.GET:
+        to_date = request.GET['to_date']
+        if to_date:
+            complaints = complaints.filter(date__lte=parse_date(to_date))
     # Add other filters as needed...
 
     if format == 'csv':
@@ -529,15 +530,35 @@ def export_complaints(request):
         response['Content-Disposition'] = 'attachment; filename="complaints.csv"'
 
         writer = csv.writer(response)
-        writer.writerow(['ID', 'Vehicle', 'Status', 'Case Type', 'Created On'])
+        writer.writerow(['ID', 'Vehicle', 'Status', 'Case Type', 'Created On', 'Brand', 'Model', 'Sub Model', 'Year Start', 'Year End', 'Number of Seats', 'Number of Doors', 'Layout Code', 'Description', 'Status', 'Date', 'Channel', 'Country', 'Person', 'Case Sub Category', 'Series', 'Material', 'SKU', 'CAD Date', 'Updated Order No'])
 
         for complaint in complaints:
             writer.writerow([
                 complaint.complaint_id,
                 str(complaint.model),
                 complaint.status,
-                complaint.case_category if complaint.case_category else '',
-                complaint.date
+                complaint.date,
+                complaint.case_type.name if complaint.case_type else '',
+                complaint.vehicle.sub_model.model.brand.name if complaint.vehicle and complaint.vehicle.sub_model and complaint.vehicle.sub_model.model and complaint.vehicle.sub_model.model.brand else '',
+                complaint.vehicle.sub_model.model.name if complaint.vehicle and complaint.vehicle.sub_model and complaint.vehicle.sub_model.model else '',
+                complaint.vehicle.sub_model.name if complaint.vehicle and complaint.vehicle.sub_model else '',
+                complaint.vehicle.year.year_start if complaint.vehicle and complaint.vehicle.year else '',
+                complaint.vehicle.year.year_end if complaint.vehicle and complaint.vehicle.year else '',
+                complaint.vehicle.number_of_seats if complaint.vehicle else '',
+                complaint.vehicle.number_of_doors if complaint.vehicle else '',
+                complaint.vehicle.layout_code if complaint.vehicle else '',
+                complaint.description,
+                complaint.status,               
+                complaint.date,
+                complaint.channel,
+                complaint.country,
+                complaint.person.name if complaint.person else '',
+                complaint.case_sub_category.name if complaint.case_sub_category else '',
+                complaint.series,
+                complaint.material,
+                complaint.sku.code if complaint.sku else '',
+                complaint.cad_date.strftime('%Y-%m-%d') if complaint.cad_date else '',
+                complaint.updated_order_no if complaint.updated_order_no else ''
             ])
         return response
 

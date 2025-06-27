@@ -59,7 +59,6 @@ class MasterSetting(models.Model):
         ('Channel', 'Channel'),
         ('Country', 'Country'),
         ('Reported By', 'Reported By'),
-        ('Category', 'Category'),
         ('Type', 'Type'),
         ('Series', 'Series'),
         ('Material', 'Material'),
@@ -102,13 +101,6 @@ class Complaint(models.Model):
         null=True, 
         limit_choices_to={'category': 'Reported By'}, 
         related_name="complaints_as_person"
-    )
-    case_category = models.ForeignKey(
-        'management.MasterSetting', 
-        on_delete=models.SET_NULL, 
-        null=True, 
-        limit_choices_to={'category': 'Category'}, 
-        related_name="complaints_as_case_category"
     )
     case_sub_category = models.ForeignKey(
         'management.MasterSetting',

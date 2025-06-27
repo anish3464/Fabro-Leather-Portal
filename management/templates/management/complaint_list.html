@@ -572,7 +572,6 @@
                             <th>Date</th>
                             <th>Channel</th>
                             <th>Country</th>
-                            <th>Category</th>
                             <th>Type</th>
                             <th>Reported By</th>
                             <th>Brand</th>
@@ -593,7 +592,6 @@
                             <td>{{ complaint.date|date:"d-M-y" }}</td>
                             <td>{{ complaint.channel|default:"-" }}</td>
                             <td>{{ complaint.country|default:"-" }}</td>
-                            <td>{{ complaint.case_category|default:"-" }}</td>
                             <td>{{ complaint.case_sub_category|default:"-" }}</td>
                             <td>{{ complaint.person.name|default:"-" }}</td>
                             <td>{{ complaint.brand|default:"-" }}</td>
@@ -680,10 +678,6 @@
                                         <div class="detail-item">
                                             <div class="detail-label">Reported By</div>
                                             <div class="detail-value">{{ complaint.person|default:"-" }}</div>
-                                        </div>
-                                        <div class="detail-item">
-                                            <div class="detail-label">Category</div>
-                                            <div class="detail-value">{{ complaint.case_category|default:"-" }}</div>
                                         </div>
                                         <div class="detail-item">
                                             <div class="detail-label">Type</div>

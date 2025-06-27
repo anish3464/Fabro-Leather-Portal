@@ -48,7 +48,7 @@ class ComplaintForm(forms.ModelForm):
     class Meta:
         model = Complaint
         fields = [
-            'complaint_id','date', 'channel', 'country', 'person', 'case_category','case_sub_category', 'series', 'material', 
+            'complaint_id','date', 'channel', 'country', 'person','case_sub_category', 'series', 'material', 
             'brand', 'model', 'sub_model', 'year', 'status','priority','sku', 'cad_date', 'updated_order_no',
             'complaint_description', 'batch_order', 
             'justification_from_factory', 'action_from_factory'
@@ -59,7 +59,6 @@ class ComplaintForm(forms.ModelForm):
             'channel': forms.Select(attrs={'class': 'form-select'}),
             'country': forms.Select(attrs={'class': 'form-select'}),
             'person': forms.Select(attrs={'class': 'form-select'}),
-            'case_category': forms.Select(attrs={'class': 'form-select'}),
             'case_sub_category': forms.Select(attrs={'class': 'form-select'}),
             'series': forms.Select(attrs={'class': 'form-select'}),
             'material': forms.Select(attrs={'class': 'form-select'}),
