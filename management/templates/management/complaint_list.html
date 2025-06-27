@@ -640,37 +640,20 @@
                         <div id="modal-{{ complaint.complaint_id }}" class="modal">
                             <div class="modal-content">
                                 <div class="modal-header">
-                                    <h2 class="modal-title">Complaint Details #{{ complaint.complaint_id }}</h2>
+                                    <div class="detail-value">
+                                                <h2>{{ complaint.date|date:"d-M-y" }} - 
+                                                <span class="status-badge status-{{ complaint.status|lower|cut:' ' }}">
+                                                    {{ complaint.status }}
+                                                </span> </h2>
+                                            </div>
                                     <button class="close-btn" onclick="closeModal('{{ complaint.complaint_id }}')">
                                         <i class="fas fa-times"></i>
                                     </button>
                                 </div>
                                 <div class="modal-body">
+                                    <!-- PRODUCT & SOURCE -->
+                                    <h3 class="section-title">Product & Source:</h3>
                                     <div class="detail-grid">
-                                        <div class="detail-item">
-                                            <div class="detail-label">Date</div>
-                                            <div class="detail-value">{{ complaint.date|date:"d-M-y" }}</div>
-                                        </div>
-                                        <div class="detail-item">
-                                            <div class="detail-label">Status</div>
-                                            <div class="detail-value">
-                                                <span class="status-badge status-{{ complaint.status|lower|cut:' ' }}">
-                                                    {{ complaint.status }}
-                                                </span>
-                                            </div>
-                                        </div>
-                                        <div class="detail-item">
-                                            <div class="detail-label">Channel</div>
-                                            <div class="detail-value">{{ complaint.channel|default:"-" }}</div>
-                                        </div>
-                                        <div class="detail-item">
-                                            <div class="detail-label">Priority</div>
-                                            <div class="detail-value">
-                                                <span class="status-badge status-{{ complaint.priority|lower|cut:' ' }}">
-                                                    {{ complaint.priority }}
-                                                </span>
-                                            </div>
-                                        </div>
                                         <div class="detail-item">
                                             <div class="detail-label">Country</div>
                                             <div class="detail-value">{{ complaint.country|default:"-" }}</div>
@@ -684,38 +667,50 @@
                                             <div class="detail-value">{{ complaint.case_sub_category|default:"-" }}</div>
                                         </div>
                                         <div class="detail-item">
-                                            <div class="detail-label">Brand</div>
-                                            <div class="detail-value">{{ complaint.brand|default:"-" }}</div>
-                                        </div>
-                                        <div class="detail-item">
-                                            <div class="detail-label">Model</div>
-                                            <div class="detail-value">{{ complaint.model|default:"-" }}</div>
-                                        </div>
-                                        <div class="detail-item">
-                                            <div class="detail-label">Sub-Model</div>
-                                            <div class="detail-value">{{ complaint.sub_model|default:"-" }}</div>
-                                        </div>
-                                        <div class="detail-item">
-                                            <div class="detail-label">Year</div>
+                                            <div class="detail-label">Vehicle</div>
                                             <div class="detail-value">
+                                                {{ complaint.brand }} {{ complaint.model }}
                                                 {% if complaint.year %}
-                                                    {{ complaint.year.year_start|stringformat:"s"|slice:"-2:" }}-{{ complaint.year.year_end|stringformat:"s"|slice:"-2:" }}
+                                                     {{ complaint.year.year_start|stringformat:"s"|slice:"-2:" }}-{{ complaint.year.year_end|stringformat:"s"|slice:"-2:" }}
                                                 {% else %}
-                                                    -
+                                                     -
                                                 {% endif %}
+                                                 {{ complaint.sub_model|default:"-" }}
                                             </div>
-                                        </div>                    
+                                        </div>
                                         <div class="detail-item">
                                             <div class="detail-label">Series</div>
                                             <div class="detail-value">{{ complaint.series|default:"-" }}</div>
                                         </div>
+                                    </div>
+
+                                    <!-- COMPLAINT DETAILS -->
+                                    <h3 class="section-title">Complaint Details:</h3>
+                                    <div class="detail-grid">
                                         <div class="detail-item">
-                                            <div class="detail-label">Material</div>
-                                            <div class="detail-value">{{ complaint.material|default:"-" }}</div>
+                                            <div class="detail-label">Complaint Description</div>
+                                            <div class="detail-value">{{ complaint.complaint_description }}</div>
                                         </div>
                                         <div class="detail-item">
-                                            <div class="detail-label">Updated Order #</div>
-                                            <div class="detail-value">{{ complaint.updated_order_no }}</div>
+                                            <div class="detail-label">Batch/Order#</div>
+                                            <div class="detail-value">{{ complaint.batch_order }}</div>
+                                        </div>
+                                        <div class="detail-item">
+                                            <div class="detail-label">SKU</div>
+                                            <div class="detail-value">{{ complaint.sku|default:"-" }}</div>
+                                        </div>
+                                    </div>
+
+                                    <!-- FROM FACTORY -->
+                                    <h3 class="section-title">From Factory:</h3>
+                                    <div class="detail-grid">
+                                        <div class="detail-item">
+                                            <div class="detail-label">Reason</div>
+                                            <div class="detail-value">{{ complaint.justification_from_factory }}</div>
+                                        </div>
+                                        <div class="detail-item">
+                                            <div class="detail-label">Resolution</div>
+                                            <div class="detail-value">{{ complaint.action_from_factory }}</div>
                                         </div>
                                         <div class="detail-item">
                                             <div class="detail-label">CAD Date</div>
@@ -727,52 +722,35 @@
                                                 {% endif %}
                                             </div>
                                         </div>
-                                    </div>
-
-
-                                    <div class="detail-item" style="margin-bottom: 1rem;">
-                                        <div class="detail-label">Description</div>
-                                        <div class="detail-value">{{ complaint.complaint_description }}</div>
-                                    </div>
-
-                                    <div class="detail-item" style="margin-bottom: 1rem;">
-                                        <div class="detail-label">Batch/Order</div>
-                                        <div class="detail-value">{{ complaint.batch_order }}</div>
-                                    </div>
-
-                                    <div class="detail-item" style="margin-bottom: 1rem;">
-                                        <div class="detail-label">Reason</div>
-                                        <div class="detail-value">{{ complaint.justification_from_factory }}</div>
-                                    </div>
-
-                                    <div class="detail-item" style="margin-bottom: 1rem;">
-                                        <div class="detail-label">Resolution</div>
-                                        <div class="detail-value">{{ complaint.action_from_factory }}</div>
-                                    </div>
-
-                                    {% if complaint.media_files.count > 0 %}
                                         <div class="detail-item">
-                                            <div class="detail-label">Media Files ({{ complaint.media_files.count }})</div>
-                                            <div class="media-grid">
-                                                {% for media in complaint.media_files.all %}
-                                                    {% if ".jpg" in media.file.url|lower or ".jpeg" in media.file.url|lower or ".png" in media.file.url|lower %}
-                                                        <div class="media-item" onclick="enlargeImage('{{ media.file.url }}')">
-                                                            <img src="{{ media.file.url }}" class="media-thumbnail" alt="Complaint Image">
-                                                        </div>
-                                                    {% elif ".mp4" in media.file.url|lower or ".webm" in media.file.url|lower %}
-                                                        <div class="media-item" onclick="enlargeVideo('{{ media.file.url }}')">
-                                                            <video class="media-thumbnail" muted>
-                                                                <source src="{{ media.file.url }}" type="video/mp4">
-                                                            </video>
-                                                        </div>
-                                                    {% endif %}
-                                                {% endfor %}
-                                            </div>
+                                            <div class="detail-label">Updated Order#</div>
+                                            <div class="detail-value">{{ complaint.updated_order_no }}</div>
+                                        </div>
+                                    </div>
+
+                                    <!-- MEDIA FILES -->
+                                    {% if complaint.media_files.count > 0 %}
+                                        <h3 class="section-title">Media Files ({{ complaint.media_files.count }})</h3>
+                                        <div class="media-grid">
+                                            {% for media in complaint.media_files.all %}
+                                                {% if ".jpg" in media.file.url|lower or ".jpeg" in media.file.url|lower or ".png" in media.file.url|lower %}
+                                                    <div class="media-item" onclick="enlargeImage('{{ media.file.url }}')">
+                                                        <img src="{{ media.file.url }}" class="media-thumbnail" alt="Complaint Image">
+                                                    </div>
+                                                {% elif ".mp4" in media.file.url|lower or ".webm" in media.file.url|lower %}
+                                                    <div class="media-item" onclick="enlargeVideo('{{ media.file.url }}')">
+                                                        <video class="media-thumbnail" muted>
+                                                            <source src="{{ media.file.url }}" type="video/mp4">
+                                                        </video>
+                                                    </div>
+                                                {% endif %}
+                                            {% endfor %}
                                         </div>
                                     {% endif %}
                                 </div>
                             </div>
                         </div>
+
                         {% endfor %}
                     </tbody>
                 </table>
