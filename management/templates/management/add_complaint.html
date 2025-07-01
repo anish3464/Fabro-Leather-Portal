@@ -355,16 +355,14 @@
                     
                     <div class="form-group">
                         <label class="form-label">{{ form.date.label }}</label>
-                        <div class="date-input-wrapper">
-                            <div class="date-input">{{ form.date }}
-                            <i class="fas fa-calendar-alt date-icon"></i></div>
-                        </div>
+                        <label>{{ date.today }}</label>
+                        <input type="hidden" name="date" value="{{ date.today }}">
                     </div>
 
-                    <div class="form-group">
+                    {% comment %} <div class="form-group">
                         <label class="form-label">{{ form.status.label }}</label>
                         {{ form.status }}
-                    </div>
+                    </div> {% endcomment %}
 
                     <div class="form-group">
                         <label class="form-label">{{ form.priority.label }}</label>
@@ -392,34 +390,6 @@
                     <div class="form-group">
                         <label class="form-label">Reported By</label>
                         {{ form.person }}
-                    </div>
-                </div>
-
-                <!-- Case Details -->
-                <div class="form-section">
-                    <h3 class="section-title">
-                        <i class="fas fa-clipboard-list"></i>
-                        Case Details
-                    </h3>
-
-                    <div class="form-group">
-                        <label class="form-label">Type</label>
-                        {{form.case_sub_category}}
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">{{ form.series.label }}</label>
-                        {{ form.series }}
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">{{ form.material.label }}</label>
-                        {{ form.material }}
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">Update Order # </label>
-                        {{ form.updated_order_no }}
                     </div>
                 </div>
 
@@ -462,7 +432,35 @@
                     </div>
                 </div>
             </div>
+            
+            <div class="form-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-clipboard-list"></i>
+                        Case Details
+                    </h3>
 
+                    <div class="form-group">
+                        <label class="form-label">Type</label>
+                        {{form.case_sub_category}}
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">{{ form.series.label }}</label>
+                        {{ form.series }}
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">{{ form.material.label }}</label>
+                        {{ form.material }}
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">{{ form.batch_order.label }}</label>
+                        {{ form.batch_order }}
+                    </div>
+                    
+                </div>
+                
             <!-- Description Section -->
             <div class="form-section" style="margin-bottom: 2rem;">
                 <h3 class="section-title">
@@ -475,11 +473,11 @@
                     {{ form.complaint_description }}
                 </div>
 
+                
                 <div class="form-group">
-                    <label class="form-label">{{ form.batch_order.label }}</label>
-                    {{ form.batch_order }}
+                        <label class="form-label">Update Order # </label>
+                        {{ form.updated_order_no }}
                 </div>
-
                 <div class="form-group">
                     <label class="form-label">CAD Date</label>
                     <div class="date-input-wrapper">
