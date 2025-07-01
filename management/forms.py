@@ -84,6 +84,7 @@ class ComplaintForm(forms.ModelForm):
         today = date.today()
         self.fields['date'].initial = today
         self.fields['date'].disabled = True
+        self.fields['status'].initial = 'Open'
         self.fields['brand'].queryset = Brand.objects.all()
         self.fields['model'].queryset = Model.objects.none()
         self.fields['sub_model'].queryset = SubModel.objects.none()
