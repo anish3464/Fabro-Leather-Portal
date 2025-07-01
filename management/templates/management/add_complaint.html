@@ -354,15 +354,19 @@
                     </div>
                     
                     <div class="form-group">
-                        <label class="form-label">{{ form.date.label }}</label>
-                        <label>{{ date.today }}</label>
-                        <input type="hidden" name="date" value="{{ date.today }}">
+                        <label class="form-label">Date</label>
+                        <div class="date-input-wrapper">
+                            <div class="date-input" id="dateInput">
+                                {{ form.date }}
+                                <i class="fas fa-calendar-alt date-icon"></i>
+                            </div>
+                        </div>
                     </div>
 
-                    {% comment %} <div class="form-group">
+                    <div class="form-group">
                         <label class="form-label">{{ form.status.label }}</label>
                         {{ form.status }}
-                    </div> {% endcomment %}
+                    </div>
 
                     <div class="form-group">
                         <label class="form-label">{{ form.priority.label }}</label>
@@ -427,13 +431,11 @@
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label">{{ form.sku.label }}</label>
+                        <label class="form-label">SKU</label>
                         {{ form.sku }}
                     </div>
                 </div>
-            </div>
-            
-            <div class="form-section">
+                <div class="form-section">
                     <h3 class="section-title">
                         <i class="fas fa-clipboard-list"></i>
                         Case Details
@@ -460,6 +462,9 @@
                     </div>
                     
                 </div>
+            </div>
+            
+            
                 
             <!-- Description Section -->
             <div class="form-section" style="margin-bottom: 2rem;">

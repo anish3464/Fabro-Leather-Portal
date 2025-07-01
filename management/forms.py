@@ -1,5 +1,6 @@
 from django import forms
 from .models import Complaint, ComplaintMedia, MasterSetting, Brand, Model, SubModel, YearRange, SKU
+from datetime import date
 
 class CarDetailsForm(forms.Form):
     layout_code = forms.CharField(label="Layout Code", max_length=100)
@@ -80,6 +81,9 @@ class ComplaintForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        today = date.today()
+        self.fields['date'].initial = today
+        self.fields['date'].disabled = True
         self.fields['brand'].queryset = Brand.objects.all()
         self.fields['model'].queryset = Model.objects.none()
         self.fields['sub_model'].queryset = SubModel.objects.none()
