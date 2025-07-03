@@ -4,6 +4,7 @@ import random
 import string
 from django.contrib.auth.models import User
 from django.utils import timezone
+import datetime
 
 class Brand(models.Model):
     name = models.CharField(max_length=100, unique=True)
@@ -73,9 +74,21 @@ class MasterSetting(models.Model):
     def __str__(self):
         return self.name
 
-    
+
 def generate_complaint_id():
-    return ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
+    today = datetime.date.today()
+    year = today.year % 100
+    month = today.month
+    sequence = 1  
+    try:
+        last_sequence
+    except NameError:
+        last_sequence = 0
+
+    sequence = last_sequence + 1
+    last_sequence = sequence
+
+    return f"{year:02d}{month:02d}{sequence:04d}"
 
 class Complaint(models.Model):
     complaint_id = models.CharField(primary_key=True, max_length=10, unique=True, default=generate_complaint_id)
