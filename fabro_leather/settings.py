@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
-
+import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-(x&3e2@zyjh*ga&f)%z8wpj)cb-w(e%uvu2f(!7t0hk5=6+s^=
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -39,7 +39,21 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'management',
     'simple_history',
+    'storages',
 ]
+
+AWS_ACCESS_KEY_ID = 'AKIARKLYOKDUUO5IHRWL'
+AWS_SECRET_ACCESS_KEY = 'jE1+mEoREGWVV65UMDhZMFKuh5KuBcDO8jIPXKvj'
+AWS_STORAGE_BUCKET_NAME = 'fabro-leather-media'
+AWS_S3_REGION_NAME = 'ap-south-2'  # your bucket's region
+
+AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
+AWS_S3_FILE_OVERWRITE = False
+AWS_DEFAULT_ACL = None
+AWS_QUERYSTRING_AUTH = False  # Optional: disable if you want public URLs
+
+# Set S3 as media backend
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -79,7 +93,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'postgres',
-        'USER': 'postgres.xydyubeocbntpcjueqqq',
+        'USER': 'postgres.emzjhosmfjevobfcxbhs',
         'PASSWORD': 'SPUQLBRMbn1BavVV',
         'HOST': 'aws-0-ap-south-1.pooler.supabase.com',
         'PORT': '6543',
@@ -123,6 +137,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
