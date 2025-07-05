@@ -12,6 +12,9 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -20,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-(x&3e2@zyjh*ga&f)%z8wpj)cb-w(e%uvu2f(!7t0hk5=6+s^='
+SECRET_KEY = os.environ['DB_USER']  # Use the environment variable for the secret key
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -42,9 +45,9 @@ INSTALLED_APPS = [
     'storages',
 ]
 
-AWS_ACCESS_KEY_ID = 'AKIARKLYOKDUUO5IHRWL'
-AWS_SECRET_ACCESS_KEY = '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'
-AWS_STORAGE_BUCKET_NAME = 'fabro-leather-media'
+AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
+AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME')
 AWS_S3_REGION_NAME = 'ap-south-2'  # your bucket's region
 
 AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
@@ -91,12 +94,12 @@ WSGI_APPLICATION = 'fabro_leather.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
+        'ENGINE': os.getenv('DATABASE_ENGINE'),
         'NAME': 'postgres',
-        'USER': 'postgres.emzjhosmfjevobfcxbhs',
-        'PASSWORD': 'SPUQLBRMbn1BavVV',
-        'HOST': 'aws-0-ap-south-1.pooler.supabase.com',
-        'PORT': '6543',
+        'USER': os.getenv('DB_USER'),
+        'PASSWORD': os.getenv('DATABASE_PASSWORD'),
+        'HOST': os.getenv('DATABASE_HOST'),
+        'PORT': os.getenv('DATABASE_PORT')
     }
 }
 
@@ -151,6 +154,3 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = 'logout_success'
-
-
-# mongodb+srv://anishvayoli:wgmPNFSPpn4u7Qc@cluster0.yrkomo5.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
