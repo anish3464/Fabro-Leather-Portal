@@ -5,6 +5,7 @@ from datetime import date
 class CarDetailsForm(forms.Form):
     layout_code = forms.CharField(label="Layout Code", max_length=100)
     brand_name = forms.CharField(label="Brand Name", max_length=100)
+    brand_logo = forms.ImageField(label="Brand Logo", required=False)
     model_name = forms.CharField(label="Model Name", max_length=100)
     sub_model_name = forms.CharField(label="Sub-Model Name", max_length=100, required=False,)
     year_start = forms.IntegerField(label="Year Start", min_value=1900, max_value=2100)
@@ -15,6 +16,7 @@ class CarDetailsForm(forms.Form):
     widgets = {
         'layout_code': forms.TextInput(attrs={'class': 'form-input'}),
         'brand_name': forms.TextInput(attrs={'class': 'form-input'}),
+        'brand_logo': forms.ClearableFileInput(attrs={'class': 'form-input'}),
         'model_name': forms.TextInput(attrs={'class': 'form-input'}),
         'sub_model_name': forms.TextInput(attrs={'class': 'form-input'}),
         'year_start': forms.NumberInput(attrs={'class': 'form-input'}),
