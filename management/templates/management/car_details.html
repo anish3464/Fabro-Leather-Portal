@@ -226,7 +226,7 @@
         .table {
             width: 100%;
             border-collapse: collapse;
-            min-width: 800px;
+            min-width: 900px;
         }
 
         .table th {
@@ -259,6 +259,18 @@
 
         .table tr:hover {
             background-color: rgba(37, 99, 235, 0.05);
+        }
+
+        .brand-logo-cell {
+            width: 60px;
+            height: 40px;
+            object-fit: contain;
+            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        body.light-mode .brand-logo-cell {
+            border-color: #e2e8f0;
         }
 
         .action-buttons {
@@ -472,6 +484,7 @@
                             <thead>
                                 <tr>
                                     <th>#</th>
+                                    <th>Brand Logo</th>
                                     <th>Layout Code</th>
                                     <th>Brand</th>
                                     <th>Model</th>
@@ -486,6 +499,15 @@
                                 {% for car in car_data %}
                                     <tr>
                                         <td>{{ forloop.counter }}</td>
+                                        <td>
+                                            {% if car.brand_logo %}
+                                                <img src="{{ car.brand_logo.url }}" class="brand-logo-cell" alt="{{ car.brand }} logo">
+                                            {% else %}
+                                                <div style="width: 60px; height: 40px; background: var(--dark-card); border-radius: 4px; display: flex; align-items: center; justify-content: center; color: var(--dark-text-secondary); font-size: 0.75rem;">
+                                                    No Logo
+                                                </div>
+                                            {% endif %}
+                                        </td>
                                         <td><strong>{{ car.layout_code }}</strong></td>
                                         <td>{{ car.brand }}</td>
                                         <td>{{ car.model }}</td>
@@ -536,10 +558,9 @@
                 const subModelVal = subModelInput.value.trim().toLowerCase();
 
                 rows.forEach(row => {
-                    const layoutCode = row.cells[1].textContent.toLowerCase();
-                    const brand = row.cells[2].textContent.toLowerCase();
-                    const model = row.cells[3].textContent.toLowerCase();
-                    const subModel = row.cells[4].textContent.toLowerCase();
+                    const layoutCode = row.cells[2].textContent.toLowerCase();
+                    const brand = row.cells[3].textContent.toLowerCase();
+                    const model = row.cells[4].textContent.toLowerCase();
 
                     const matchBrand = !brandVal || layoutCode.includes(brandVal);
                     const matchModel = !modelVal || brand.includes(modelVal);
@@ -552,15 +573,6 @@
             brandInput.addEventListener("input", filterTable);
             modelInput.addEventListener("input", filterTable);
             subModelInput.addEventListener("input", filterTable);
-        }
-
-        // Modal functions
-        function closeDuplicateModal() {
-            document.getElementById("duplicateModal").style.display = "none";
-        }
-
-        function closeLayoutCodeErrorModal() {
-            document.getElementById("layoutCodeErrorModal").style.display = "none";
         }
 
         // Initialize

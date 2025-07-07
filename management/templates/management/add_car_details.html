@@ -157,6 +157,63 @@
             box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
         }
 
+        .file-upload-area {
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        body.light-mode .file-upload-area {
+            border-color: #cbd5e1;
+        }
+
+        .file-upload-area:hover {
+            border-color: var(--primary-color);
+            background-color: rgba(37, 99, 235, 0.05);
+        }
+
+        .file-upload-icon {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .file-upload-text {
+            color: var(--dark-text-secondary);
+            font-size: 0.875rem;
+        }
+
+        body.light-mode .file-upload-text {
+            color: var(--light-text-secondary);
+        }
+
+        .file-input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .brand-logo-preview {
+            max-width: 100px;
+            max-height: 100px;
+            margin-top: 0.5rem;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        body.light-mode .brand-logo-preview {
+            border-color: #e2e8f0;
+        }
+
         .error-message {
             background: rgba(239, 68, 68, 0.1);
             border: 1px solid rgba(239, 68, 68, 0.3);
@@ -259,6 +316,18 @@
 
         .table tr:hover {
             background-color: rgba(37, 99, 235, 0.05);
+        }
+
+        .brand-logo-cell {
+            width: 60px;
+            height: 40px;
+            object-fit: contain;
+            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        body.light-mode .brand-logo-cell {
+            border-color: #e2e8f0;
         }
 
         .action-buttons {
@@ -475,7 +544,7 @@
                     </div>
                 {% endif %}
 
-                <form method="POST">
+                <form method="POST" enctype="multipart/form-data">
                     {% csrf_token %}
                     
                     <div class="form-group">
@@ -487,16 +556,31 @@
                     
                     <div class="form-group">
                         <label class="form-label">Brand Name</label>
-                            <input type="text" name="brand_name" class="form-input" 
-                                   placeholder="e.g., BMW, Mercedes" 
-                                   value="{{ form.brand_name.value|default:'' }}" required>
+                        <input type="text" name="brand_name" class="form-input" 
+                               placeholder="e.g., BMW, Mercedes" 
+                               value="{{ form.brand_name.value|default:'' }}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Brand Logo (Optional)</label>
+                        <div class="file-upload-area">
+                            <div class="file-upload-icon">
+                                <i class="fas fa-image"></i>
+                            </div>
+                            <div class="file-upload-text">
+                                <strong>Click to upload</strong> brand logo<br>
+                                PNG, JPG (Max 5MB)
+                            </div>
+                            <input type="file" name="brand_logo" class="file-input" accept="image/*" id="brandLogoInput">
+                        </div>
+                        <img id="logoPreview" class="brand-logo-preview" style="display: none;">
                     </div>
                     
                     <div class="form-group">
                         <label class="form-label">Model Name</label>
-                            <input type="text" name="model_name" class="form-input" 
-                                   placeholder="e.g., X5, C-Class" 
-                                   value="{{ form.model_name.value|default:'' }}" required>
+                        <input type="text" name="model_name" class="form-input" 
+                               placeholder="e.g., X5, C-Class" 
+                               value="{{ form.model_name.value|default:'' }}" required>
                     </div>
                     
                     <div class="form-group">
@@ -507,31 +591,31 @@
                     </div>
                     
                     <div class="form-group">
-                            <label class="form-label">Year Start</label>
-                            <input type="number" name="year_start" class="form-input" 
-                                   placeholder="2020" min="1900" max="2100"
-                                   value="{{ form.year_start.value|default:'' }}" required>
+                        <label class="form-label">Year Start</label>
+                        <input type="number" name="year_start" class="form-input" 
+                               placeholder="2020" min="1900" max="2100"
+                               value="{{ form.year_start.value|default:'' }}" required>
                     </div>
                     
                     <div class="form-group">
                         <label class="form-label">Year End</label>
-                            <input type="number" name="year_end" class="form-input" 
-                                   placeholder="2025" min="1900" max="2100"
-                                   value="{{ form.year_end.value|default:'' }}" required>
+                        <input type="number" name="year_end" class="form-input" 
+                               placeholder="2025" min="1900" max="2100"
+                               value="{{ form.year_end.value|default:'' }}" required>
                     </div>
                     
                     <div class="form-group">
-                            <label class="form-label">Number of Seats</label>
-                            <input type="number" name="number_of_seats" class="form-input" 
-                                   placeholder="5" min="1"
-                                   value="{{ form.number_of_seats.value|default:'' }}" required>
+                        <label class="form-label">Number of Seats</label>
+                        <input type="number" name="number_of_seats" class="form-input" 
+                               placeholder="5" min="1"
+                               value="{{ form.number_of_seats.value|default:'' }}" required>
                     </div>
                     
                     <div class="form-group">
                         <label class="form-label">Number of Doors</label>
-                            <input type="number" name="number_of_doors" class="form-input" 
-                                   placeholder="4" min="1"
-                                   value="{{ form.number_of_doors.value|default:'' }}" required>
+                        <input type="number" name="number_of_doors" class="form-input" 
+                               placeholder="4" min="1"
+                               value="{{ form.number_of_doors.value|default:'' }}" required>
                     </div>
 
                     <button type="submit" class="btn btn-primary" style="width: 100%;">
@@ -602,36 +686,22 @@
     {% endif %}
 
     <script>
-        // Search functionality
-        function setupSearch() {
-            const brandInput = document.getElementById("brandSearchInput");
-            const modelInput = document.getElementById("modelSearchInput");
-            const subModelInput = document.getElementById("subModelSearchInput");
-            const rows = document.querySelectorAll(".table tbody tr");
-
-            function filterTable() {
-                const brandVal = brandInput.value.trim().toLowerCase();
-                const modelVal = modelInput.value.trim().toLowerCase();
-                const subModelVal = subModelInput.value.trim().toLowerCase();
-
-                rows.forEach(row => {
-                    const layoutCode = row.cells[1].textContent.toLowerCase();
-                    const brand = row.cells[2].textContent.toLowerCase();
-                    const model = row.cells[3].textContent.toLowerCase();
-                    const subModel = row.cells[4].textContent.toLowerCase();
-
-                    const matchBrand = !brandVal || layoutCode.includes(brandVal);
-                    const matchModel = !modelVal || brand.includes(modelVal);
-                    const matchSubModel = !subModelVal || model.includes(subModelVal);
-
-                    row.style.display = (matchBrand && matchModel && matchSubModel) ? "" : "none";
-                });
+        // Logo preview functionality
+        document.getElementById('brandLogoInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            const preview = document.getElementById('logoPreview');
+            
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                preview.style.display = 'none';
             }
-
-            brandInput.addEventListener("input", filterTable);
-            modelInput.addEventListener("input", filterTable);
-            subModelInput.addEventListener("input", filterTable);
-        }
+        });
 
         // Modal functions
         function closeDuplicateModal() {
@@ -644,8 +714,6 @@
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
-            setupSearch();
-            
             // Add active nav state
             const vehicleLink = document.querySelector('a[href="{% url 'add_car_details' %}"]');
             if (vehicleLink) {

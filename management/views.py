@@ -42,10 +42,11 @@ def add_car_details(request):
     conflicting_car = None
 
     if request.method == "POST":
-        form = CarDetailsForm(request.POST)
+        form = CarDetailsForm(request.POST, request.FILES)
         if form.is_valid():
             layout_code = form.cleaned_data["layout_code"]
             brand_name = form.cleaned_data["brand_name"]
+            brand_logo = form.cleaned_data.get("brand_logo")
             model_name = form.cleaned_data["model_name"]
             sub_model_name = form.cleaned_data["sub_model_name"] or '-'
             year_start = form.cleaned_data["year_start"]
@@ -53,7 +54,13 @@ def add_car_details(request):
             number_of_seats = form.cleaned_data["number_of_seats"]
             number_of_doors = form.cleaned_data["number_of_doors"]
 
-            brand, _ = Brand.objects.get_or_create(name=brand_name)
+            brand, created = Brand.objects.get_or_create(name=brand_name)
+            
+            # Update brand logo if provided
+            if brand_logo:
+                brand.logo = brand_logo
+                brand.save()
+            
             model, _ = Model.objects.get_or_create(brand=brand, name=model_name)
             sub_model, _ = SubModel.objects.get_or_create(model=model, name=sub_model_name)
 
@@ -114,6 +121,7 @@ def add_car_details(request):
                         "layout_code": year_range.layout_code,
                         "id": year_range.id,
                         "brand": brand.name,
+                        "brand_logo": brand.logo,
                         "model": model.name,
                         "sub_model": sub_model.name,
                         "year_start": year_range.year_start,
@@ -142,6 +150,7 @@ def car_details(request):
                         "layout_code": year_range.layout_code,
                         "id": year_range.id,
                         "brand": brand.name,
+                        "brand_logo": brand.logo,
                         "model": model.name,
                         "sub_model": sub_model.name,
                         "year_start": year_range.year_start,
@@ -170,6 +179,7 @@ def delete_car_detail(request, year_range_id):
 @login_required
 def edit_car_detail(request, car_id):
     year_range = get_object_or_404(YearRange, id=car_id)
+    existing_logo = year_range.sub_model.model.brand.logo
 
     # Prepopulate form values
     initial_data = {
@@ -184,10 +194,11 @@ def edit_car_detail(request, car_id):
     }
 
     if request.method == "POST":
-        form = CarDetailsForm(request.POST)
+        form = CarDetailsForm(request.POST, request.FILES)
         if form.is_valid():
             layout_code = form.cleaned_data["layout_code"].strip()
             brand_name = form.cleaned_data["brand_name"].strip()
+            brand_logo = form.cleaned_data.get("brand_logo")
             model_name = form.cleaned_data["model_name"].strip()
             sub_model_name = form.cleaned_data["sub_model_name"].strip() or '-'
             year_start = form.cleaned_data["year_start"]
@@ -201,9 +212,16 @@ def edit_car_detail(request, car_id):
                 return render(request, 'management/edit_car_detail.html', {
                     'form': form,
                     'car_id': car_id,
+                    'existing_logo': existing_logo,
                 })
 
             brand, _ = Brand.objects.get_or_create(name=brand_name)
+            
+            # Update brand logo if provided
+            if brand_logo:
+                brand.logo = brand_logo
+                brand.save()
+            
             model, _ = Model.objects.get_or_create(brand=brand, name=model_name)
 
             sub_model = None
@@ -233,6 +251,7 @@ def edit_car_detail(request, car_id):
     return render(request, 'management/edit_car_detail.html', {
         'form': form,
         'car_id': car_id,
+        'existing_logo': existing_logo,
     })
 
 
@@ -892,4 +911,3 @@ def get_active_users():
                 continue
 
     return active_users
-
