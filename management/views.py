@@ -489,7 +489,7 @@ def edit_complaint(request, complaint_id):
                 media.delete()  # You can also delete from S3 if you want
 
             # Upload new media to S3
-            for uploaded_file in request.FILES.getlist('media_files'):
+            for uploaded_file in request.FILES.getlist('media'):
                 s3_key = f'media/complaint_media/complaint_{complaint.complaint_id}/{uploaded_file.name}'
                 bucket_name = AWS_STORAGE_BUCKET_NAME
                 region_name = AWS_S3_REGION_NAME
@@ -708,7 +708,7 @@ def add_sku(request):
                 for row in reader:
                     code = row.get('code', '').strip()
                     description = row.get('description', '').strip()
-                    region_name = row.get('region', '').strip()
+                    region_name = row.get('region', '').strip() if 'region' in row else ''
 
                     if not code:
                         continue  # skip rows with no code
@@ -717,7 +717,9 @@ def add_sku(request):
                         skipped += 1
                         continue
 
-                    region = MasterSetting.objects.filter(name=region_name, setting_type='Region').first()
+                    region = None
+                    if region_name:
+                        region = MasterSetting.objects.filter(name=region_name, category='Region').first()
 
                     SKU.objects.create(
                         code=code,

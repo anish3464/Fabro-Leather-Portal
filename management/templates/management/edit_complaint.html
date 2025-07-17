@@ -8,7 +8,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         .page-container {
-            max-width: 1000px;
+            max-width: 1200px;
             margin: 0 auto;
             padding: 2rem;
         }
@@ -23,6 +23,10 @@
             font-weight: 700;
             color: var(--dark-text);
             margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
         }
 
         body.light-mode .page-title {
@@ -38,12 +42,23 @@
             color: var(--light-text-secondary);
         }
 
+        .complaint-id-badge {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            margin-left: 1rem;
+        }
+
         .form-container {
             background: var(--dark-surface);
             border-radius: var(--border-radius);
             padding: 2rem;
             box-shadow: var(--shadow);
             border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 2rem;
         }
 
         body.light-mode .form-container {
@@ -78,6 +93,8 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid rgba(37, 99, 235, 0.2);
         }
 
         .form-group {
@@ -130,102 +147,73 @@
             min-height: 100px;
         }
 
-        .date-input-wrapper {
-            position: relative;
-        }
-
-        .date-input {
-            width: 100%;
-            padding: 0.75rem 1rem;
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            background-color: var(--dark-bg);
-            color: var(--dark-text);
-            font-size: 0.875rem;
-            transition: all 0.2s ease;
-            cursor: pointer;
-        }
-
-        body.light-mode .date-input {
-            background-color: var(--light-surface);
-            color: var(--light-text);
-            border-color: #e2e8f0;
-        }
-
-        .date-input:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-        }
-
-        .date-icon {
-            position: absolute;
-            right: 1rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--dark-text-secondary);
-            pointer-events: none;
-        }
-
-        body.light-mode .date-icon {
-            color: var(--light-text-secondary);
-        }
-
         .media-section {
-            background: var(--dark-card);
-            border-radius: 12px;
-            padding: 1.5rem;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            background: var(--dark-surface);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             margin-bottom: 2rem;
         }
 
         body.light-mode .media-section {
-            background: var(--light-card);
-            border-color: #f1f5f9;
+            background: var(--light-surface);
+            border-color: #e2e8f0;
         }
 
         .media-title {
-            font-size: 1.125rem;
+            font-size: 1.25rem;
             font-weight: 600;
             color: var(--primary-color);
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid rgba(37, 99, 235, 0.2);
         }
 
         .media-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
             gap: 1rem;
             margin-bottom: 1.5rem;
         }
 
         .media-item {
-            background: var(--dark-surface);
-            border-radius: 8px;
+            background: var(--dark-card);
+            border-radius: 12px;
             padding: 1rem;
             border: 1px solid rgba(255, 255, 255, 0.05);
             text-align: center;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
 
         body.light-mode .media-item {
-            background: var(--light-surface);
-            border-color: #e2e8f0;
+            background: var(--light-card);
+            border-color: #f1f5f9;
         }
 
         .media-item:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary-color);
         }
 
         .media-preview {
             width: 100%;
-            height: 120px;
+            height: 140px;
             object-fit: cover;
-            border-radius: 6px;
+            border-radius: 8px;
             margin-bottom: 0.75rem;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .media-preview:hover {
+            transform: scale(1.05);
         }
 
         .media-checkbox {
@@ -233,50 +221,59 @@
             align-items: center;
             justify-content: center;
             gap: 0.5rem;
-            margin-top: 0.5rem;
+            margin-top: 0.75rem;
+            padding: 0.5rem;
+            background: rgba(239, 68, 68, 0.1);
+            border-radius: 8px;
+            border: 1px solid rgba(239, 68, 68, 0.2);
         }
 
         .checkbox-input {
-            width: 1rem;
-            height: 1rem;
+            width: 1.125rem;
+            height: 1.125rem;
             accent-color: var(--error-color);
         }
 
         .checkbox-label {
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             color: var(--error-color);
-            font-weight: 500;
+            font-weight: 600;
+            cursor: pointer;
         }
 
         .file-upload-area {
             border: 2px dashed rgba(255, 255, 255, 0.2);
             border-radius: 12px;
-            padding: 2rem;
+            padding: 2.5rem;
             text-align: center;
             transition: all 0.3s ease;
             cursor: pointer;
             position: relative;
             overflow: hidden;
+            background: var(--dark-card);
         }
 
         body.light-mode .file-upload-area {
             border-color: #cbd5e1;
+            background: var(--light-card);
         }
 
         .file-upload-area:hover {
             border-color: var(--primary-color);
             background-color: rgba(37, 99, 235, 0.05);
+            transform: translateY(-2px);
         }
 
         .file-upload-icon {
-            font-size: 2rem;
+            font-size: 3rem;
             color: var(--primary-color);
-            margin-bottom: 0.5rem;
+            margin-bottom: 1rem;
         }
 
         .file-upload-text {
             color: var(--dark-text-secondary);
-            font-size: 0.875rem;
+            font-size: 1rem;
+            line-height: 1.5;
         }
 
         body.light-mode .file-upload-text {
@@ -307,12 +304,12 @@
         }
 
         .btn {
-            padding: 0.75rem 2rem;
-            border-radius: 8px;
+            padding: 0.875rem 2rem;
+            border-radius: 10px;
             font-weight: 600;
             font-size: 0.875rem;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
             border: none;
             display: flex;
             align-items: center;
@@ -323,17 +320,18 @@
         .btn-primary {
             background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
             color: white;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
         }
 
         .btn-primary:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(37, 99, 235, 0.4);
         }
 
         .btn-secondary {
             background: var(--dark-card);
             color: var(--dark-text-secondary);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.1);
         }
 
         body.light-mode .btn-secondary {
@@ -345,6 +343,7 @@
         .btn-secondary:hover {
             background: var(--dark-surface);
             color: var(--dark-text);
+            transform: translateY(-2px);
         }
 
         body.light-mode .btn-secondary:hover {
@@ -354,13 +353,90 @@
 
         .empty-media {
             text-align: center;
-            padding: 2rem;
+            padding: 3rem;
             color: var(--dark-text-secondary);
             font-style: italic;
+            background: var(--dark-card);
+            border-radius: 12px;
+            border: 2px dashed rgba(255, 255, 255, 0.1);
         }
 
         body.light-mode .empty-media {
             color: var(--light-text-secondary);
+            background: var(--light-card);
+            border-color: #e2e8f0;
+        }
+
+        .empty-media-icon {
+            font-size: 3rem;
+            opacity: 0.5;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .media-count-badge {
+            background: var(--primary-color);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .form-row-full {
+            grid-column: 1 / -1;
+        }
+
+        /* Modal for image preview */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            max-width: 90%;
+            max-height: 90%;
+        }
+
+        .modal-image {
+            max-width: 100%;
+            max-height: 100%;
+            border-radius: 8px;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 3rem;
+            height: 3rem;
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         @media (max-width: 768px) {
@@ -368,7 +444,8 @@
                 padding: 1rem;
             }
 
-            .form-container {
+            .form-container,
+            .media-section {
                 padding: 1.5rem;
             }
 
@@ -378,7 +455,7 @@
             }
 
             .media-grid {
-                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
             }
 
             .btn-group {
@@ -387,6 +464,20 @@
 
             .btn {
                 justify-content: center;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .page-title {
+                font-size: 1.5rem;
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .complaint-id-badge {
+                margin-left: 0;
             }
         }
     </style>
@@ -397,8 +488,9 @@
     <div class="page-container">
         <div class="page-header">
             <h1 class="page-title">
-                <i class="fas fa-edit" style="color: var(--primary-color);"></i>
+                <i class="fas fa-edit"></i>
                 Edit Complaint
+                <span class="complaint-id-badge">{{ complaint.complaint_id }}</span>
             </h1>
             <p class="page-subtitle">Update complaint information and manage media files</p>
         </div>
@@ -408,60 +500,155 @@
 
             <div class="form-grid">
                 <!-- Basic Information -->
-                {{ form.as_p }}
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-info-circle"></i>
+                        Basic Information
+                    </h3>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Date</label>
+                        {{ form.date }}
+                    </div>
 
-            <!-- Existing Media Section -->
-            <div class="media-section">
-                <h3 class="media-title">
-                    <i class="fas fa-images"></i>
-                    Existing Media Files
-                </h3>
-                
-                {% if media_files %}
-                    <div class="media-grid">
-                        {% for media in media_files %}
-                            <div class="media-item">
-                                {% if ".jpg" in media.file or ".jpeg" in media.file or ".png" in media.file %}
-                                    <img src="{{ media.file }}" class="media-preview" alt="Complaint Image">
-                                {% elif ".mp4" in media.file or ".webm" in media.file %}
-                                    <video class="media-preview" muted>
-                                        <source src="{{ media.file }}" type="video/mp4">
-                                    </video>
-                                {% endif %}
-                                <div class="media-checkbox">
-                                    <input type="checkbox" name="delete_media" value="{{ media.id }}" 
-                                           id="delete_{{ media.id }}" class="checkbox-input">
-                                    <label for="delete_{{ media.id }}" class="checkbox-label">
-                                        <i class="fas fa-trash"></i> Delete
-                                    </label>
-                                </div>
-                            </div>
-                        {% endfor %}
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Status</label>
+                            {{ form.status }}
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Priority</label>
+                            {{ form.priority }}
+                        </div>
                     </div>
-                {% else %}
-                    <div class="empty-media">
-                        <i class="fas fa-images" style="font-size: 2rem; opacity: 0.5; margin-bottom: 0.5rem; display: block;"></i>
-                        No media files attached to this complaint
+                </div>
+
+                <!-- Contact Information -->
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-user"></i>
+                        Contact Information
+                    </h3>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Channel</label>
+                        {{ form.channel }}
                     </div>
-                {% endif %}
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Country</label>
+                            {{ form.country }}
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Reported By</label>
+                            {{ form.person }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Vehicle Information -->
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-car"></i>
+                        Vehicle Information
+                    </h3>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Brand</label>
+                        {{ form.brand }}
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Model</label>
+                            <select id="id_model" name="model" class="form-select" disabled required>
+                                <option value="">Select Model</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Sub-Model</label>
+                            <select id="id_sub_model" name="sub_model" class="form-select" disabled>
+                                <option value="">Select Sub-Model (Optional)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Year</label>
+                            <select id="id_year" name="year" class="form-select" disabled required>
+                                <option value="">Select Year</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">SKU</label>
+                            {{ form.sku }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Case Details -->
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-clipboard-list"></i>
+                        Case Details
+                    </h3>
+
+                    <div class="form-group">
+                        <label class="form-label">Type</label>
+                        {{ form.case_sub_category }}
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Series</label>
+                            {{ form.series }}
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Material</label>
+                            {{ form.material }}
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Batch Order</label>
+                        {{ form.batch_order }}
+                    </div>
+                </div>
             </div>
 
-            <!-- Add New Media Section -->
-            <div class="media-section">
-                <h3 class="media-title">
-                    <i class="fas fa-plus-circle"></i>
-                    Add New Media Files
+            <!-- Description Section -->
+            <div class="form-section" style="margin-bottom: 2rem;">
+                <h3 class="section-title">
+                    <i class="fas fa-file-alt"></i>
+                    Complaint Details
                 </h3>
                 
-                <div class="file-upload-area">
-                    <div class="file-upload-icon">
-                        <i class="fas fa-cloud-upload-alt"></i>
+                <div class="form-group">
+                    <label class="form-label">Complaint Description</label>
+                    {{ form.complaint_description }}
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Updated Order #</label>
+                        {{ form.updated_order_no }}
                     </div>
-                    <div class="file-upload-text">
-                        <strong>Click to upload</strong> or drag and drop<br>
-                        Images and videos (Max 10MB each)
+                    <div class="form-group">
+                        <label class="form-label">CAD Date</label>
+                        {{ form.cad_date }}
                     </div>
-                    <input type="file" name="media" multiple class="file-input" accept="image/*,video/*">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Reason</label>
+                    {{ form.justification_from_factory }}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Resolution</label>
+                    {{ form.action_from_factory }}
                 </div>
             </div>
 
@@ -476,73 +663,237 @@
                 </button>
             </div>
         </form>
+
+        <!-- Existing Media Section -->
+        <div class="media-section">
+            <h3 class="media-title">
+                <i class="fas fa-images"></i>
+                Existing Media Files
+                {% if media_files %}
+                    <span class="media-count-badge">{{ media_files.count }}</span>
+                {% endif %}
+            </h3>
+            
+            {% if media_files %}
+                <form method="POST" id="deleteMediaForm">
+                    {% csrf_token %}
+                    <div class="media-grid">
+                        {% for media in media_files %}
+                            <div class="media-item">
+                                {% if ".jpg" in media.file or ".jpeg" in media.file or ".png" in media.file %}
+                                    <img src="{{ media.file }}" class="media-preview" alt="Complaint Image" 
+                                         onclick="openImageModal('{{ media.file }}')">
+                                {% elif ".mp4" in media.file or ".webm" in media.file %}
+                                    <video class="media-preview" muted onclick="openVideoModal('{{ media.file }}')">
+                                        <source src="{{ media.file }}" type="video/mp4">
+                                    </video>
+                                {% endif %}
+                                <div class="media-checkbox">
+                                    <input type="checkbox" name="delete_media" value="{{ media.id }}" 
+                                           id="delete_{{ media.id }}" class="checkbox-input">
+                                    <label for="delete_{{ media.id }}" class="checkbox-label">
+                                        <i class="fas fa-trash"></i> Mark for Deletion
+                                    </label>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div style="text-align: center; margin-top: 1rem;">
+                        <button type="submit" class="btn btn-secondary" style="background: var(--error-color); color: white;">
+                            <i class="fas fa-trash"></i>
+                            Delete Selected Media
+                        </button>
+                    </div>
+                </form>
+            {% else %}
+                <div class="empty-media">
+                    <i class="fas fa-images empty-media-icon"></i>
+                    <h4>No media files attached</h4>
+                    <p>This complaint doesn't have any media files yet. You can add some below.</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Add New Media Section -->
+        <div class="media-section">
+            <h3 class="media-title">
+                <i class="fas fa-plus-circle"></i>
+                Add New Media Files
+            </h3>
+            
+            <form method="POST" enctype="multipart/form-data" id="addMediaForm">
+                {% csrf_token %}
+                <div class="file-upload-area" id="uploadArea">
+                    <div class="file-upload-icon">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                    </div>
+                    <div class="file-upload-text">
+                        <strong>Click to upload</strong> or drag and drop<br>
+                        Images and videos (Max 10MB each)<br>
+                        <small>Supported formats: JPG, PNG, MP4, WEBM</small>
+                    </div>
+                    <input type="file" name="media" multiple class="file-input" accept="image/*,video/*" id="mediaInput">
+                </div>
+                
+                <div style="text-align: center; margin-top: 1rem;">
+                    <button type="submit" class="btn btn-primary" id="uploadBtn" disabled>
+                        <i class="fas fa-upload"></i>
+                        Upload New Media
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Image Modal -->
+    <div id="imageModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()">
+                <i class="fas fa-times"></i>
+            </button>
+            <img id="modalImage" class="modal-image">
+        </div>
     </div>
 
     <script>
-      function loadDependentData(url, targetId, emptyMessage) {
-        const targetSelect = document.getElementById(targetId);
-        targetSelect.innerHTML = `<option value="">${emptyMessage}</option>`;
-        targetSelect.disabled = true;
+        // Dynamic form loading for vehicle dropdowns
+        function loadDependentData(url, targetId, emptyMessage) {
+            const targetSelect = document.getElementById(targetId);
+            targetSelect.innerHTML = `<option value="">${emptyMessage}</option>`;
+            targetSelect.disabled = true;
 
-        fetch(url)
-            .then(response => response.json())
-            .then(data => {
-                data.forEach(item => {
-                    const option = document.createElement('option');
-                    option.value = item.id;
-                    option.textContent = item.name || item.range;
-                    targetSelect.appendChild(option);
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    data.forEach(item => {
+                        const option = document.createElement('option');
+                        option.value = item.id;
+                        option.textContent = item.name || item.range;
+                        targetSelect.appendChild(option);
+                    });
+                    targetSelect.disabled = false;
+                })
+                .catch(error => {
+                    console.error('Error loading data:', error);
                 });
-                targetSelect.disabled = false;
-            });
-    }
-
-    document.getElementById('id_brand').addEventListener('change', function () {
-        const brandId = this.value;
-        loadDependentData(`/api/models/${brandId}/`, 'id_model', 'Select Model');
-        document.getElementById('id_sub_model').disabled = true;
-        document.getElementById('id_year').disabled = true;
-    });
-
-    document.getElementById('id_model').addEventListener('change', function () {
-        const modelId = this.value;
-        loadDependentData(`/api/sub_models/${modelId}/`, 'id_sub_model', 'Select Sub-Model (Optional)');
-        document.getElementById('id_year').disabled = true;
-    });
-
-    document.getElementById('id_sub_model').addEventListener('change', function () {
-        const subModelId = this.value;
-        loadDependentData(`/api/year_ranges/${subModelId}/`, 'id_year', 'Select Year');
-    });
-
-
-        // File upload handling
-        const fileInput = document.querySelector('.file-input');
-        const uploadArea = document.querySelector('.file-upload-area');
-
-        if (fileInput && uploadArea) {
-            fileInput.addEventListener('change', function() {
-                const files = this.files;
-                if (files.length > 0) {
-                    uploadArea.style.borderColor = 'var(--success-color)';
-                    uploadArea.style.backgroundColor = 'rgba(16, 185, 129, 0.1)';
-                    document.querySelector('.file-upload-text').innerHTML = 
-                        `<strong>${files.length} file(s) selected</strong><br>Ready to upload`;
-                }
-            });
         }
 
-         // Initialize
+        document.getElementById('id_brand').addEventListener('change', function () {
+            const brandId = this.value;
+            if (brandId) {
+                loadDependentData(`/api/models/${brandId}/`, 'id_model', 'Select Model');
+            }
+            document.getElementById('id_sub_model').disabled = true;
+            document.getElementById('id_year').disabled = true;
+        });
+
+        document.getElementById('id_model').addEventListener('change', function () {
+            const modelId = this.value;
+            if (modelId) {
+                loadDependentData(`/api/sub_models/${modelId}/`, 'id_sub_model', 'Select Sub-Model (Optional)');
+            }
+            document.getElementById('id_year').disabled = true;
+        });
+
+        document.getElementById('id_sub_model').addEventListener('change', function () {
+            const subModelId = this.value;
+            if (subModelId) {
+                loadDependentData(`/api/year_ranges/${subModelId}/`, 'id_year', 'Select Year');
+            }
+        });
+
+        // File upload handling
+        const mediaInput = document.getElementById('mediaInput');
+        const uploadArea = document.getElementById('uploadArea');
+        const uploadBtn = document.getElementById('uploadBtn');
+
+        mediaInput.addEventListener('change', function() {
+            const files = this.files;
+            if (files.length > 0) {
+                uploadArea.style.borderColor = 'var(--success-color)';
+                uploadArea.style.backgroundColor = 'rgba(16, 185, 129, 0.1)';
+                document.querySelector('.file-upload-text').innerHTML = 
+                    `<strong>${files.length} file(s) selected</strong><br>Ready to upload<br><small>Click "Upload New Media" to add them</small>`;
+                uploadBtn.disabled = false;
+                uploadBtn.style.opacity = '1';
+            } else {
+                uploadBtn.disabled = true;
+                uploadBtn.style.opacity = '0.5';
+            }
+        });
+
+        // Drag and drop functionality
+        uploadArea.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            this.style.borderColor = 'var(--primary-color)';
+            this.style.backgroundColor = 'rgba(37, 99, 235, 0.1)';
+        });
+
+        uploadArea.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            this.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+            this.style.backgroundColor = 'var(--dark-card)';
+        });
+
+        uploadArea.addEventListener('drop', function(e) {
+            e.preventDefault();
+            const files = e.dataTransfer.files;
+            mediaInput.files = files;
+            mediaInput.dispatchEvent(new Event('change'));
+        });
+
+        // Image modal functions
+        function openImageModal(src) {
+            document.getElementById('modalImage').src = src;
+            document.getElementById('imageModal').style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('imageModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('imageModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+
+        // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             // Add active nav state
             const complaintListLink = document.querySelector('a[href="{% url 'complaint_list' %}"]');
             if (complaintListLink) {
                 complaintListLink.classList.add('active');
             }
+
+            // Load existing form data for dropdowns
+            const brandSelect = document.getElementById('id_brand');
+            const modelSelect = document.getElementById('id_model');
+            const subModelSelect = document.getElementById('id_sub_model');
+            const yearSelect = document.getElementById('id_year');
+
+            // If brand is already selected, load models
+            if (brandSelect.value) {
+                loadDependentData(`/api/models/${brandSelect.value}/`, 'id_model', 'Select Model');
+                
+                // Set timeout to allow models to load, then check if model is selected
+                setTimeout(() => {
+                    if (modelSelect.value) {
+                        loadDependentData(`/api/sub_models/${modelSelect.value}/`, 'id_sub_model', 'Select Sub-Model (Optional)');
+                        
+                        setTimeout(() => {
+                            if (subModelSelect.value) {
+                                loadDependentData(`/api/year_ranges/${subModelSelect.value}/`, 'id_year', 'Select Year');
+                            }
+                        }, 500);
+                    }
+                }, 500);
+            }
         });
-
-
-
     </script>
 </body>
 </html>
