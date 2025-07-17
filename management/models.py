@@ -92,7 +92,7 @@ def generate_complaint_id():
     return f"{year:02d}{month:02d}{sequence:04d}"
 
 class Complaint(models.Model):
-    complaint_id = models.CharField(primary_key=True, max_length=10, unique=True, default=generate_complaint_id)
+    complaint_id = models.CharField(primary_key=True, max_length=10, unique=True, editable=False)
     date = models.DateField(auto_now_add=False)
     channel = models.ForeignKey(
         'management.MasterSetting', 
@@ -152,6 +152,21 @@ class Complaint(models.Model):
     updated_order_no = models.CharField(max_length=100, blank=True, null=True)
 
     def save(self, *args, **kwargs):
+        if not self.complaint_id:
+            today = timezone.now().date()
+            year = today.year % 100
+            month = today.month
+
+            # Get latest complaint for current year & month
+            prefix = f"{year:02d}{month:02d}"
+
+            latest = Complaint.objects.filter(complaint_id__startswith=prefix).order_by('-complaint_id').first()
+            if latest:
+                last_seq = int(latest.complaint_id[-4:])
+                next_seq = last_seq + 1
+            else:
+                next_seq = 1
+            self.complaint_id = f"{prefix}{next_seq:04d}"
         super().save(*args, **kwargs)    
 
     def __str__(self):
@@ -162,7 +177,7 @@ def media_upload_path(instance, filename):
 
 class ComplaintMedia(models.Model):
     complaint = models.ForeignKey(Complaint, on_delete=models.CASCADE, related_name='media_files')
-    file = models.FileField(upload_to=media_upload_path)
+    file = models.CharField()
 
     def __str__(self):
         return os.path.basename(self.file.name)

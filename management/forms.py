@@ -51,14 +51,13 @@ class ComplaintForm(forms.ModelForm):
     class Meta:
         model = Complaint
         fields = [
-            'complaint_id','date', 'channel', 'country', 'person','case_sub_category', 'series', 'material', 
+            'date', 'channel', 'country', 'person','case_sub_category', 'series', 'material', 
             'brand', 'model', 'sub_model', 'year', 'status','priority','sku', 'cad_date', 'updated_order_no',
             'complaint_description', 'batch_order', 
             'justification_from_factory', 'action_from_factory'
         ]
         widgets = {
             'date': forms.DateInput(attrs={'type': 'date'}),
-            'complaint_id': forms.TextInput(attrs={'class': 'form-input'}),
             'channel': forms.Select(attrs={'class': 'form-select'}),
             'country': forms.Select(attrs={'class': 'form-select'}),
             'person': forms.Select(attrs={'class': 'form-select'}),

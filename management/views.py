@@ -20,6 +20,7 @@ from django.utils.timezone import now
 from .forms import UserCreationForm, GroupCreationForm, AssignUserToGroupForm
 from .models import ActivityLog  # assuming you already created this
 from django.contrib.auth.models import User, Group
+from fabro_leather.settings import AWS_S3_REGION_NAME, s3, AWS_STORAGE_BUCKET_NAME
 
 @login_required
 def index(request):
@@ -335,11 +336,21 @@ def add_complaint(request):
 
             # Save each uploaded file
             for uploaded_file in request.FILES.getlist('media_files'):
+                s3_key = f'media/complaint_media/complaint_{complaint.complaint_id}/{uploaded_file.name}'
+                bucket_name = AWS_STORAGE_BUCKET_NAME
+                region_name = AWS_S3_REGION_NAME
+                s3.upload_fileobj(
+                    uploaded_file,
+                    bucket_name,
+                    s3_key,
+                    ExtraArgs={'ACL': 'public-read'}  # Optional, use if public access is needed
+                )
+                s3_url = f"https://{bucket_name}.s3.{region_name}.amazonaws.com/{s3_key}"
                 ComplaintMedia.objects.create(
                     complaint=complaint,
-                    file=uploaded_file
+                    file=s3_url
                 )
-            
+                
             ActivityLog.objects.create(
                 user=request.user,
                 action="created",
@@ -428,7 +439,8 @@ def complaint_list(request):
     country_qs = complaints.values('country__name').annotate(count=Count('country'))
     country_labels = [entry['country__name'] for entry in country_qs]
     country_data = [entry['count'] for entry in country_qs]
-
+    
+    
     return render(request, 'management/complaint_list.html', {
         'complaints': complaints,
         'status_labels': status_labels,
@@ -466,7 +478,7 @@ def edit_complaint(request, complaint_id):
     complaint = get_object_or_404(Complaint, complaint_id=complaint_id)
 
     if request.method == 'POST':
-        form = ComplaintForm(request.POST, request.FILES, instance=complaint)
+        form = ComplaintForm(request.POST, instance=complaint)
         if form.is_valid():
             form.save()
 
@@ -474,24 +486,40 @@ def edit_complaint(request, complaint_id):
             media_to_delete = request.POST.getlist('delete_media')
             for media_id in media_to_delete:
                 media = ComplaintMedia.objects.get(id=media_id)
-                media.file.delete()  # delete from storage
-                media.delete()
+                media.delete()  # You can also delete from S3 if you want
 
-            # Save new uploaded media
-            for file in request.FILES.getlist('media'):
-                ComplaintMedia.objects.create(complaint=complaint, file=file)
+            # Upload new media to S3
+            for uploaded_file in request.FILES.getlist('media_files'):
+                s3_key = f'media/complaint_media/complaint_{complaint.complaint_id}/{uploaded_file.name}'
+                bucket_name = AWS_STORAGE_BUCKET_NAME
+                region_name = AWS_S3_REGION_NAME
+
+                s3.upload_fileobj(
+                    uploaded_file,
+                    bucket_name,
+                    s3_key,
+                    ExtraArgs={'ACL': 'public-read'}
+                )
+
+                s3_url = f"https://{bucket_name}.s3.{region_name}.amazonaws.com/{s3_key}"
+
+                ComplaintMedia.objects.create(
+                    complaint=complaint,
+                    file=s3_url
+                )
 
             ActivityLog.objects.create(
                 user=request.user,
                 action="updated",
                 object_type="complaint",
                 object_name=complaint_id)
-            
+
             return redirect('complaint_list')
     else:
         form = ComplaintForm(instance=complaint)
 
     media_files = complaint.media_files.all()
+
     return render(request, 'management/edit_complaint.html', {
         'form': form,
         'complaint': complaint,
