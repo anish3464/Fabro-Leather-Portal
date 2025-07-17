@@ -489,7 +489,7 @@ def edit_complaint(request, complaint_id):
                 media.delete()  # You can also delete from S3 if you want
 
             # Upload new media to S3
-            for uploaded_file in request.FILES.getlist('media'):
+            for uploaded_file in request.FILES.getlist('media_files'):
                 s3_key = f'media/complaint_media/complaint_{complaint.complaint_id}/{uploaded_file.name}'
                 bucket_name = AWS_STORAGE_BUCKET_NAME
                 region_name = AWS_S3_REGION_NAME

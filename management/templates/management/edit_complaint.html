@@ -392,192 +392,32 @@
     </style>
 </head>
 <body>
-    {% include 'management/base.html'%}
+    {% include 'management/base.html' %}
+    
     <div class="page-container">
         <div class="page-header">
             <h1 class="page-title">
                 <i class="fas fa-edit" style="color: var(--primary-color);"></i>
-                Edit Complaint: {{ complaint.complaint_id }}
+                Edit Complaint
             </h1>
             <p class="page-subtitle">Update complaint information and manage media files</p>
         </div>
 
-        <form method="post" class="form-container" enctype="multipart/form-data">
+        <form method="POST" enctype="multipart/form-data" class="form-container">
             {% csrf_token %}
+
             <div class="form-grid">
                 <!-- Basic Information -->
-                <div class="form-section">
-                    <h3 class="section-title">
-                        <i class="fas fa-info-circle"></i>
-                        Basic Information
-                    </h3>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Date</label>
-                        {{ form.date }}
-                    </div>
+                {{ form.as_p }}
 
-                    <div class="form-group">
-                        <label class="form-label">Status</label>
-                        {{ form.status }}
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">Priority</label>
-                        {{ form.priority }}
-                    </div>
-                </div>
-
-                <!-- Contact Information -->
-                <div class="form-section">
-                    <h3 class="section-title">
-                        <i class="fas fa-user"></i>
-                        Contact Information
-                    </h3>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Channel</label>
-                        {{ form.channel }}
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">Country</label>
-                        {{ form.country }}
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">Reported By</label>
-                        {{ form.person }}
-                    </div>
-                </div>
-
-                <!-- Vehicle Information -->
-                <div class="form-section">
-                    <h3 class="section-title">
-                        <i class="fas fa-car"></i>
-                        Vehicle Information
-                    </h3>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Brand</label>
-                        {{ form.brand }}
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">Model</label>
-                        <select id="id_model" name="model" class="form-select" disabled required>
-                            <option value="">Select Model</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">Sub-Model</label>
-                        <select id="id_sub_model" name="sub_model" class="form-select" disabled>
-                            <option value="">Select Sub-Model (Optional)</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">Year</label>
-                        <select id="id_year" name="year" class="form-select" disabled required>
-                            <option value="">Select Year</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">SKU</label>
-                        {{ form.sku }}
-                    </div>
-                </div>
-                <div class="form-section">
-                    <h3 class="section-title">
-                        <i class="fas fa-clipboard-list"></i>
-                        Case Details
-                    </h3>
-
-                    <div class="form-group">
-                        <label class="form-label">Type</label>
-                        {{form.case_sub_category}}
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">Series</label>
-                        {{ form.series }}
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">Material</label>
-                        {{ form.material }}
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">Batch Order</label>
-                        {{ form.batch_order }}
-                    </div>
-                    
-                </div>
-            </div>
-            
-            
-                
-            <!-- Description Section -->
-            <div class="form-section" style="margin-bottom: 2rem;">
-                <h3 class="section-title">
-                    <i class="fas fa-file-alt"></i>
-                    Complaint Details
+            <!-- Existing Media Section -->
+            <div class="media-section">
+                <h3 class="media-title">
+                    <i class="fas fa-images"></i>
+                    Existing Media Files
                 </h3>
                 
-                <div class="form-group">
-                    <label class="form-label">Complaint Description</label>
-                    {{ form.complaint_description }}
-                </div>
-
-                
-                <div class="form-group">
-                        <label class="form-label">Update Order # </label>
-                        {{ form.updated_order_no }}
-                </div>
-                <div class="form-group">
-                    <label class="form-label">CAD Date</label>
-                    <div class="date-input-wrapper">
-                    <div class="date-input">{{ form.cad_date }}
-                            <i class="fas fa-calendar-alt date-icon"></i></div>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Reason</label>
-                    {{ form.justification_from_factory }}
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Resolution</label>
-                    {{ form.action_from_factory }}
-                </div>
-            </div>
-
-                <div class="btn-group">
-                <a href="{% url 'complaint_list' %}" class="btn btn-secondary">
-                    <i class="fas fa-times"></i>
-                    Cancel
-                </a>
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-save"></i>
-                    Update Complaint
-                </button>
-            </div>
-        </form>
-
-        <!-- Existing Media Section -->
-        <div class="media-section">
-            <h3 class="media-title">
-                <i class="fas fa-images"></i>
-                Existing Media Files ({{ media_files.count }})
-            </h3>
-            
-            {% if media_files %}
-                <form method="POST">
-                    {% csrf_token %}
+                {% if media_files %}
                     <div class="media-grid">
                         {% for media in media_files %}
                             <div class="media-item">
@@ -591,32 +431,28 @@
                                 <div class="media-checkbox">
                                     <input type="checkbox" name="delete_media" value="{{ media.id }}" 
                                            id="delete_{{ media.id }}" class="checkbox-input">
-                                    <label for="delete_{{ media.id }}" class="checkbox-label">Delete</label>
+                                    <label for="delete_{{ media.id }}" class="checkbox-label">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </label>
                                 </div>
                             </div>
                         {% endfor %}
                     </div>
-                    <button type="submit" class="btn btn-secondary" style="background: var(--error-color); color: white;">
-                        <i class="fas fa-trash"></i>
-                        Delete Selected
-                    </button>
-                </form>
-            {% else %}
-                <div class="empty-media">
-                    No media files attached to this complaint.
-                </div>
-            {% endif %}
-        </div>
+                {% else %}
+                    <div class="empty-media">
+                        <i class="fas fa-images" style="font-size: 2rem; opacity: 0.5; margin-bottom: 0.5rem; display: block;"></i>
+                        No media files attached to this complaint
+                    </div>
+                {% endif %}
+            </div>
 
-        <!-- Add New Media Section -->
-        <div class="media-section">
-            <h3 class="media-title">
-                <i class="fas fa-plus-circle"></i>
-                Add New Media Files
-            </h3>
-            
-            <form method="POST" enctype="multipart/form-data">
-                {% csrf_token %}
+            <!-- Add New Media Section -->
+            <div class="media-section">
+                <h3 class="media-title">
+                    <i class="fas fa-plus-circle"></i>
+                    Add New Media Files
+                </h3>
+                
                 <div class="file-upload-area">
                     <div class="file-upload-icon">
                         <i class="fas fa-cloud-upload-alt"></i>
@@ -625,98 +461,122 @@
                         <strong>Click to upload</strong> or drag and drop<br>
                         Images and videos (Max 10MB each)
                     </div>
-                    <input type="file" name="media" multiple class="file-input" accept="image/*,video/*">
+                    <input type="file" name="media_files" multiple class="file-input" accept="image/*,video/*">
                 </div>
-                
-                <div style="text-align: center; margin-top: 1rem;">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-upload"></i>
-                        Upload Media
-                    </button>
-                </div>
-            </form>
-        </div>
+            </div>
+
+            <div class="btn-group">
+                <a href="{% url 'complaint_list' %}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i>
+                    Cancel
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i>
+                    Update Complaint
+                </button>
+            </div>
+        </form>
     </div>
 
     <script>
-        // Dynamic form loading for vehicle dropdowns
-        function loadDependentData(url, targetId, emptyMessage) {
-            const targetSelect = document.getElementById(targetId);
-            targetSelect.innerHTML = `<option value="">${emptyMessage}</option>`;
-            targetSelect.disabled = true;
+      function loadDependentData(url, targetId, emptyMessage) {
+        const targetSelect = document.getElementById(targetId);
+        targetSelect.innerHTML = `<option value="">${emptyMessage}</option>`;
+        targetSelect.disabled = true;
 
-            fetch(url)
-                .then(response => response.json())
-                .then(data => {
-                    data.forEach(item => {
-                        const option = document.createElement('option');
-                        option.value = item.id;
-                        option.textContent = item.name || item.range;
-                        targetSelect.appendChild(option);
-                    });
-                    targetSelect.disabled = false;
-                })
-                .catch(error => {
-                    console.error('Error loading data:', error);
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                data.forEach(item => {
+                    const option = document.createElement('option');
+                    option.value = item.id;
+                    option.textContent = item.name || item.range;
+                    targetSelect.appendChild(option);
                 });
+                targetSelect.disabled = false;
+            });
+    }
+
+    document.getElementById('id_brand').addEventListener('change', function () {
+        const brandId = this.value;
+        loadDependentData(`/api/models/${brandId}/`, 'id_model', 'Select Model');
+        document.getElementById('id_sub_model').disabled = true;
+        document.getElementById('id_year').disabled = true;
+    });
+
+    document.getElementById('id_model').addEventListener('change', function () {
+        const modelId = this.value;
+        loadDependentData(`/api/sub_models/${modelId}/`, 'id_sub_model', 'Select Sub-Model (Optional)');
+        document.getElementById('id_year').disabled = true;
+    });
+
+    document.getElementById('id_sub_model').addEventListener('change', function () {
+        const subModelId = this.value;
+        loadDependentData(`/api/year_ranges/${subModelId}/`, 'id_year', 'Select Year');
+    });
+
+
+        // File upload handling
+        const fileInput = document.querySelector('.file-input');
+        const uploadArea = document.querySelector('.file-upload-area');
+
+        if (fileInput && uploadArea) {
+            fileInput.addEventListener('change', function() {
+                const files = this.files;
+                if (files.length > 0) {
+                    uploadArea.style.borderColor = 'var(--success-color)';
+                    uploadArea.style.backgroundColor = 'rgba(16, 185, 129, 0.1)';
+                    document.querySelector('.file-upload-text').innerHTML = 
+                        `<strong>${files.length} file(s) selected</strong><br>Ready to upload`;
+                }
+            });
         }
 
-        document.getElementById('id_brand').addEventListener('change', function () {
-            const brandId = this.value;
-            if (brandId) {
-                loadDependentData(`/api/models/${brandId}/`, 'id_model', 'Select Model');
-            }
-            document.getElementById('id_sub_model').disabled = true;
-            document.getElementById('id_year').disabled = true;
-        });
-
-        document.getElementById('id_model').addEventListener('change', function () {
-            const modelId = this.value;
-            if (modelId) {
-                loadDependentData(`/api/sub_models/${modelId}/`, 'id_sub_model', 'Select Sub-Model (Optional)');
-            }
-            document.getElementById('id_year').disabled = true;
-        });
-
-        document.getElementById('id_sub_model').addEventListener('change', function () {
-            const subModelId = this.value;
-            if (subModelId) {
-                loadDependentData(`/api/year_ranges/${subModelId}/`, 'id_year', 'Select Year');
-            }
-        });
-
-        // Initialize
+         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             // Add active nav state
             const complaintListLink = document.querySelector('a[href="{% url 'complaint_list' %}"]');
             if (complaintListLink) {
                 complaintListLink.classList.add('active');
             }
-
-            // Load existing form data for dropdowns
-            const brandSelect = document.getElementById('id_brand');
-            const modelSelect = document.getElementById('id_model');
-            const subModelSelect = document.getElementById('id_sub_model');
-            const yearSelect = document.getElementById('id_year');
-
-            // If brand is already selected, load models
-            if (brandSelect.value) {
-                loadDependentData(`/api/models/${brandSelect.value}/`, 'id_model', 'Select Model');
-                
-                // Set timeout to allow models to load, then check if model is selected
-                setTimeout(() => {
-                    if (modelSelect.value) {
-                        loadDependentData(`/api/sub_models/${modelSelect.value}/`, 'id_sub_model', 'Select Sub-Model (Optional)');
-                        
-                        setTimeout(() => {
-                            if (subModelSelect.value) {
-                                loadDependentData(`/api/year_ranges/${subModelSelect.value}/`, 'id_year', 'Select Year');
-                            }
-                        }, 500);
-                    }
-                }, 500);
-            }
         });
+
+    
+    document.addEventListener('DOMContentLoaded', function () {
+        const brand = document.getElementById('id_brand');
+        const model = document.getElementById('id_model');
+        const subModel = document.getElementById('id_sub_model');
+        const year = document.getElementById('id_year');
+
+        const initialModel = "{{ form.instance.model.id|default:'' }}";
+        const initialSubModel = "{{ form.instance.sub_model.id|default:'' }}";
+        const initialYear = "{{ form.instance.year.id|default:'' }}";
+
+        if (brand.value) {
+            loadDependentData(`/api/models/${brand.value}/`, 'id_model', 'Select Model');
+        }
+
+        if (initialModel) {
+            setTimeout(() => {
+                loadDependentData(`/api/sub_models/${initialModel}/`, 'id_sub_model', 'Select Sub-Model (Optional)');
+                setTimeout(() => {
+                    if (initialSubModel) {
+                        loadDependentData(`/api/year_ranges/${initialSubModel}/`, 'id_year', 'Select Year');
+                    }
+                }, 300);
+            }, 300);
+        }
+
+        // Set selected values after AJAX populates them
+        setTimeout(() => {
+            if (initialModel) model.value = initialModel;
+            if (initialSubModel) subModel.value = initialSubModel;
+            if (initialYear) year.value = initialYear;
+        }, 1000);
+    });
+
+
+
     </script>
 </body>
 </html>
